@@ -23,33 +23,22 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Request permissions when the app is initialized
   await requestPermissions();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   tz.initializeTimeZones();
-
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('app_icon');
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
   runApp(const MyApp());
 }
-
-// Function to request permissions
 Future<void> requestPermissions() async {
-  // Request multiple permissions at once
   Map<Permission, PermissionStatus> statuses = await [
-    Permission.notification, // Adding notification permission
+    Permission.notification,
   ].request();
-
-  // Check if any of the permissions are denied
   if (statuses.containsValue(PermissionStatus.denied)) {
-    // Show a dialog requesting the user to grant permissions
     showDialog(
       context: scaffoldMessengerKey.currentContext!,
       builder: (BuildContext context) {

@@ -1,11 +1,14 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as Path;
+import 'package:shimmer/shimmer.dart';
+import 'package:sunmolor_team/helper/dimension.dart';
 
 class UploadPage extends StatefulWidget {
   @override
@@ -13,125 +16,485 @@ class UploadPage extends StatefulWidget {
 }
 
 class _UploadPageState extends State<UploadPage> {
+  final TextEditingController _folderController = TextEditingController();
+  String? _selectedFolder;
   File? _image;
-  final ImagePicker _picker = ImagePicker();
+  final picker = ImagePicker();
+  double _uploadProgress = 0.0;
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
+  Map<String, dynamic>? _selectedPhoto;
+  bool _isAdmin = false;
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-      _uploadImageToFirestore();
-    }
+  @override
+  void initState() {
+    super.initState();
+    _checkAdminStatus(); // Panggil fungsi untuk memeriksa status admin saat aplikasi dimuat
   }
 
-  Future<void> _uploadImageToFirestore() async {
-    if (_image == null) return;
-
+  Future<void> _checkAdminStatus() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String email = user.email!;
-        Reference storageReference = FirebaseStorage.instance
-            .ref()
-            .child('uploads')
-            .child(email)
-            .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
-        UploadTask uploadTask = storageReference.putFile(_image!);
-        await uploadTask.whenComplete(() => null);
-        String imageUrl = await storageReference.getDownloadURL();
-
-        await FirebaseFirestore.instance.collection('uploads').add({
-          'email': email,
-          'imageUrl': imageUrl,
-          'timestamp': Timestamp.now(),
-        });
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(email)
+            .get();
+        if (userDoc.exists) {
+          String status = userDoc['status'];
+          setState(() {
+            _isAdmin = status ==
+                'admin'; // Menetapkan _isAdmin menjadi true jika status adalah 'admin'
+          });
+        }
       }
     } catch (e) {
-      print('Error uploading image: $e');
+      print('Error loading user status from Firestore: $e');
     }
   }
 
-  Future<void> _downloadImage(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-    final bytes = response.bodyBytes;
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    final directory = await getApplicationDocumentsDirectory();
-    final imagePath = '${directory.path}/downloaded_image.jpg';
-    File imageFile = File(imagePath);
-    await imageFile.writeAsBytes(bytes);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future<void> _uploadFile() async {
+    if (_image != null && _selectedFolder != null) {
+      String fileName = Path.basename(_image!.path);
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('uploads/$_selectedFolder/$fileName');
+      UploadTask uploadTask = storageReference.putFile(_image!);
+
+      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        setState(() {
+          _uploadProgress = snapshot.bytesTransferred.toDouble() /
+              snapshot.totalBytes.toDouble();
+        });
+      });
+
+      await uploadTask.whenComplete(() => null);
+      String downloadURL = await storageReference.getDownloadURL();
+
+      await FirebaseFirestore.instance
+          .collection('uploads')
+          .doc(_selectedFolder)
+          .collection('images')
+          .add({'url': downloadURL, 'fileName': fileName});
+
+      setState(() {
+        _image = null;
+        _uploadProgress = 0.0;
+      });
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => SuccesseOverlay(
+            message: "File Berhasil Diupload",
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a folder and an image.')),
+      );
+    }
+  }
+
+  Future<void> _createFolder(String folderName) async {
+    await FirebaseFirestore.instance
+        .collection('uploads')
+        .doc(folderName)
+        .set({'created': FieldValue.serverTimestamp()});
+    setState(() {
+      _selectedFolder = folderName;
+    });
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => SuccesseOverlay(
+          message: "File Berhasil Diupload",
+        ),
+      ),
+    );
+  }
+
+  Future<List<String>> _getFolders() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('uploads').get();
+    return querySnapshot.docs.map((doc) => doc.id).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _getPhotos(String folder) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('uploads')
+        .doc(folder)
+        .collection('images')
+        .get();
+    return querySnapshot.docs
+        .map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
+        .toList();
+  }
+
+  Future<void> _downloadFile(String url) async {
+    setState(() {
+      _isDownloading = true;
+      _downloadProgress = 0.0;
+    });
+
+    final Reference ref = FirebaseStorage.instance.refFromURL(url);
+    final Directory? tempDir = await getExternalStorageDirectory();
+    final Directory downloadDir =
+        Directory('${tempDir!.path}/sunmolor_team_photos');
+    if (!await downloadDir.exists()) {
+      await downloadDir.create(recursive: true);
+    }
+    final File file = File('${downloadDir.path}/${ref.name}');
+    final downloadTask = ref.writeToFile(file);
+
+    downloadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      setState(() {
+        _downloadProgress = snapshot.bytesTransferred.toDouble() /
+            snapshot.totalBytes.toDouble();
+      });
+    });
+
+    await downloadTask.whenComplete(() {
+      setState(() {
+        _isDownloading = false;
+        _downloadProgress = 0.0;
+      });
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('File downloaded to ${file.path}')),
+    );
+  }
+
+  Future<void> _deletePhoto(BuildContext context) async {
+    if (_selectedFolder != null && _selectedPhoto != null) {
+      // Hapus foto dari Firebase Storage
+      final Reference ref =
+          FirebaseStorage.instance.refFromURL(_selectedPhoto!['url']);
+      await ref.delete();
+
+      // Hapus catatan foto dari Firestore
+      await FirebaseFirestore.instance
+          .collection('uploads')
+          .doc(_selectedFolder)
+          .collection('images')
+          .doc(_selectedPhoto!['id'])
+          .delete();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Photo deleted successfully')),
+      );
+
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Image'),
+        centerTitle: true,
+        title: const Text('Upload Photo Sunmolor Team'),
       ),
-      body: Column(
-        children: [
-          _image != null
-              ? Image.file(
-                  _image!,
-                  height: 300,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                )
-              : Placeholder(
-                  fallbackHeight: 300,
-                  fallbackWidth: double.infinity,
-                ),
-          ElevatedButton(
-            onPressed: _pickImage,
-            child: Text('Pick Image'),
-          ),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('uploads')
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                return GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_isAdmin) // Hanya tampilkan widget Container jika pengguna memiliki status admin
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey,
                   ),
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    var doc = snapshot.data!.docs[index];
-                    String imageUrl = doc['imageUrl'];
-                    return GestureDetector(
-                      onTap: () {
-                        _downloadImage(imageUrl);
-                      },
-                      child: GridTile(
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            Image.network(imageUrl, fit: BoxFit.cover),
-                            ElevatedButton(
-                              onPressed: () {
-                                _downloadImage(imageUrl);
-                              },
-                              child: Text('Download'),
-                            ),
-                          ],
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    controller: _folderController,
+                    decoration: InputDecoration(
+                      labelText: 'Masukan Nama Folder',
+                      labelStyle: const TextStyle(color: Colors.black),
+                      border: InputBorder.none,
+                      suffixIcon: IconButton(
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.black,
                         ),
+                        onPressed: () {
+                          if (_folderController.text.isNotEmpty) {
+                            _createFolder(_folderController.text);
+                            _folderController.clear();
+                          }
+                        },
                       ),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 20),
+              FutureBuilder<List<String>>(
+                future: _getFolders(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No folders available');
+                  } else {
+                    return DropdownButton<String>(
+                      value: _selectedFolder,
+                      hint: const Text('Select Folder'),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedFolder = newValue;
+                        });
+                      },
+                      items: snapshot.data!
+                          .map<DropdownMenuItem<String>>((String folder) {
+                        return DropdownMenuItem<String>(
+                          value: folder,
+                          child: Text(folder),
+                        );
+                      }).toList(),
                     );
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+              _image == null
+                  ? const Text('No photo selected to upload.')
+                  : Image.file(_image!),
+              const SizedBox(height: 20),
+              if (_uploadProgress > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: LinearProgressIndicator(
+                    value: _uploadProgress,
+                    minHeight: 10,
+                    backgroundColor: Colors.grey[200],
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: _pickImage,
+                    child: const Text('Choose Photo'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _uploadFile,
+                    child: const Text('Upload Photo'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              if (_selectedFolder != null)
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: _getPhotos(_selectedFolder!),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: 6,
+                        itemBuilder: (context, index) {
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text('No photos in this folder yet');
+                    } else {
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          var photo = snapshot.data![index];
+                          return GestureDetector(
+                            onTap: () async {
+                              setState(() {
+                                _selectedPhoto = photo;
+                              });
+                              await showDialog(
+                                context: context,
+                                builder: (context) => StatefulBuilder(
+                                  builder: (context, setState) {
+                                    return AlertDialog(
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Image.network(photo['url']),
+                                          if (_isDownloading)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 16.0),
+                                              child: LinearProgressIndicator(
+                                                value: _downloadProgress,
+                                                minHeight: 10,
+                                                backgroundColor:
+                                                    Colors.grey[200],
+                                                valueColor:
+                                                    const AlwaysStoppedAnimation<
+                                                        Color>(Colors.blue),
+                                              ),
+                                            ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Icon(
+                                                    Icons.close_rounded),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              ElevatedButton(
+                                                onPressed: _isDownloading
+                                                    ? null
+                                                    : () {
+                                                        _downloadFile(
+                                                            photo['url']);
+                                                      },
+                                                child: const Icon(
+                                                  Icons.file_download_rounded,
+                                                  color: Colors.green,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                             if (_isAdmin) // Hanya tampilkan tombol delete jika pengguna memiliki status admin
+                                                ElevatedButton(
+                                                  onPressed: _isDownloading
+                                                      ? null
+                                                      : () {
+                                                          _deletePhoto(context);
+                                                        },
+                                                  child: const Icon(
+                                                    Icons.delete_forever,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: Image.network(photo['url']),
+                          );
+                        },
+                      );
+                    }
                   },
-                );
-              },
-            ),
+                ),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class SuccesseOverlay extends StatefulWidget {
+  final String message;
+  final int countdownSeconds;
+
+  SuccesseOverlay({
+    required this.message,
+    this.countdownSeconds = 3,
+  });
+
+  @override
+  _SuccesseOverlayState createState() => _SuccesseOverlayState();
+}
+
+class _SuccesseOverlayState extends State<SuccesseOverlay> {
+  late int countdown;
+
+  @override
+  void initState() {
+    super.initState();
+    countdown = widget.countdownSeconds;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      type: MaterialType.transparency,
+      child: SafeArea(
+        child: _buildOverlayContent(context),
+      ),
+    );
+  }
+
+  Widget _buildOverlayContent(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(Dimensions.size20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Lottie.asset(
+              "assets/lottie/success.json",
+              frameRate: FrameRate(60),
+              width: Dimensions.size100 * 2,
+              repeat: true,
+            ),
+            SizedBox(
+              height: Dimensions.size50,
+            ),
+            Text(
+              widget.message,
+              style: TextStyle(
+                fontSize: Dimensions.text20,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
