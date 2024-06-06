@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "789661885548",
+    "project_id": "sunmolor-team",
+    "storage_bucket": "sunmolor-team.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:789661885548:android:ff4f263cdb128e67a5a449",
+        "android_client_info": {
+          "package_name": "com.sasat.sunmolorteam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCytHti8p3N6L5qPktB5Gnj7caZSTwATww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
