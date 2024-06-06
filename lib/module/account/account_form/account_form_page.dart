@@ -1,13 +1,15 @@
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sunmolor_team/helper/dimension.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart'; // Add this import
+import 'package:http/http.dart' as http; // Add this import
+import 'package:device_info_plus/device_info_plus.dart'; // Add this import
+import 'package:battery_plus/battery_plus.dart'; // Add this import
+import 'package:location/location.dart'; // Add this import
+import 'package:sunmolor_team/module/upload/upload_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
 
@@ -18,12 +20,9 @@ class AccountFormPage extends StatefulWidget {
 
 class _AccountFormPageState extends State<AccountFormPage> {
   final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _nickNameController =
-      TextEditingController(); // Added nickname field
-  final TextEditingController _addressController =
-      TextEditingController(); // Added address field
-  final TextEditingController _phoneNumberController =
-      TextEditingController(); // Added phone number field
+  final TextEditingController _nickNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
   File? _image;
   String _gender = '';
@@ -34,7 +33,40 @@ class _AccountFormPageState extends State<AccountFormPage> {
     super.initState();
     _loadProfileImage();
     _loadUserDataFromFirestore();
+    _fetchBatteryInfo();
+    _fetchLocation();
   }
+void _fetchBatteryInfo() async {
+  final Battery battery = Battery();
+  final int batteryLevel = await battery.batteryLevel;
+  print('Battery level: $batteryLevel%');
+}
+
+void _fetchLocation() async {
+  Location location = Location();
+  bool _serviceEnabled;
+  PermissionStatus _permissionGranted;
+  LocationData _locationData;
+
+  _serviceEnabled = await location.serviceEnabled();
+  if (!_serviceEnabled) {
+    _serviceEnabled = await location.requestService();
+    if (!_serviceEnabled) {
+      return;
+    }
+  }
+
+  _permissionGranted = await location.hasPermission();
+  if (_permissionGranted == PermissionStatus.denied) {
+    _permissionGranted = await location.requestPermission();
+    if (_permissionGranted != PermissionStatus.granted) {
+      return;
+    }
+  }
+
+  _locationData = await location.getLocation();
+  print('Latitude: ${_locationData.latitude}, Longitude: ${_locationData.longitude}');
+}
 
   void _loadProfileImage() async {
     try {
@@ -48,8 +80,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
 
         if (userDoc.exists) {
           setState(() {
-            _imageUrl = userDoc[
-                'profileImageURL']; // Ambil URL gambar profil dari Firestore
+            _imageUrl = userDoc['profileImageURL'];
           });
         }
       }
@@ -62,44 +93,33 @@ class _AccountFormPageState extends State<AccountFormPage> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        String email = user.email!; // Ambil email pengguna saat ini
-
+        String email = user.email!;
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
-            .doc(email) // Ambil dokumen berdasarkan email
+            .doc(email)
             .get();
 
         if (userDoc.exists) {
-          print(
-              'Data from Firestore: ${userDoc.data()}'); // Print data from Firestore
           setState(() {
-            // Isi kontrol formulir berdasarkan data yang diambil dari Firestore
             _fullNameController.text = userDoc['fullName'];
-            _nickNameController.text =
-                userDoc['nickName']; // Set nickname field
-            _addressController.text = userDoc['address']; // Set address field
-            _phoneNumberController.text =
-                userDoc['phoneNumber']; // Set phone number field
+            _nickNameController.text = userDoc['nickName'];
+            _addressController.text = userDoc['address'];
+            _phoneNumberController.text = userDoc['phoneNumber'];
             _birthDateController.text = userDoc['birthDate'];
             _gender = userDoc['gender'];
           });
 
-          // Load profile image URL if exists
           String? profileImageURL = userDoc['profileImageURL'];
           if (profileImageURL != null && profileImageURL.isNotEmpty) {
-            // Load profile image from URL if exists
-            // Download the image and store it locally
             try {
               final response = await http.get(Uri.parse(profileImageURL));
               final bytes = response.bodyBytes;
 
-              // Save the image to local storage
               final directory = await getApplicationDocumentsDirectory();
               final imagePath = '${directory.path}/profile_image.jpg';
               File imageFile = File(imagePath);
               await imageFile.writeAsBytes(bytes);
 
-              // Set the image file to the state
               setState(() {
                 _image = imageFile;
               });
@@ -127,43 +147,41 @@ class _AccountFormPageState extends State<AccountFormPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text(
-                "Hallo",
+                "Hello",
                 style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic),
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
-              SizedBox(
-                height: Dimensions.size5,
-              ),
+              const SizedBox(height: 20),
               Text(
                 email,
                 style: const TextStyle(fontSize: 20),
               ),
-              SizedBox(
-                height: Dimensions.size20,
-              ),
+              const SizedBox(height: 20),
               GestureDetector(
                 onTap: () {
                   _selectImage(context);
                 },
                 child: CircleAvatar(
-                radius: 70,
-                backgroundImage: _image != null
-                    ? FileImage(_image!) as ImageProvider<Object>?
-                    : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
+                  radius: 70,
+                  backgroundImage: _image != null
+                      ? FileImage(_image!) as ImageProvider<Object>?
+                      : (_imageUrl != null ? NetworkImage(_imageUrl!) : null)
+                          as ImageProvider<Object>?,
+                ),
               ),
-            
-              ), SizedBox(height: Dimensions.size10),
-              Text("Klik image untuk mengupload photo profile"),
-              SizedBox(height: Dimensions.size30),
+              const SizedBox(height: 10),
+              const Text("Tap the image to upload profile photo"),
+              const SizedBox(height: 30),
               TextFormField(
                 controller: _fullNameController,
                 decoration: const InputDecoration(
-                  labelText: 'Nama Lengkap',
+                  labelText: 'Full Name',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                      Radius.circular(20.0),
                     ),
                   ),
                 ),
@@ -172,10 +190,10 @@ class _AccountFormPageState extends State<AccountFormPage> {
               TextFormField(
                 controller: _nickNameController,
                 decoration: const InputDecoration(
-                  labelText: 'Nama Panggilan',
+                  labelText: 'Nick Name',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                      Radius.circular(20.0),
                     ),
                   ),
                 ),
@@ -184,10 +202,10 @@ class _AccountFormPageState extends State<AccountFormPage> {
               TextFormField(
                 controller: _addressController,
                 decoration: const InputDecoration(
-                  labelText: 'Alamat Lengkap',
+                  labelText: 'Address',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                      Radius.circular(20.0),
                     ),
                   ),
                 ),
@@ -197,10 +215,10 @@ class _AccountFormPageState extends State<AccountFormPage> {
                 keyboardType: TextInputType.number,
                 controller: _phoneNumberController,
                 decoration: const InputDecoration(
-                  labelText: 'No Handphone',
+                  labelText: 'Phone Number',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                      Radius.circular(20.0),
                     ),
                   ),
                 ),
@@ -214,10 +232,10 @@ class _AccountFormPageState extends State<AccountFormPage> {
                   child: TextFormField(
                     controller: _birthDateController,
                     decoration: const InputDecoration(
-                      labelText: 'Tanggal Lahir',
+                      labelText: 'Birth Date',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
-                          Radius.circular(20.0), // Adjust the radius as needed
+                          Radius.circular(20.0),
                         ),
                       ),
                     ),
@@ -242,10 +260,10 @@ class _AccountFormPageState extends State<AccountFormPage> {
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                      Radius.circular(20.0),
                     ),
                   ),
-                  labelText: 'Jenis Kelamin',
+                  labelText: 'Gender',
                 ),
               ),
               const SizedBox(height: 32),
@@ -253,16 +271,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                 onPressed: () {
                   _uploadDataToFirestore(context);
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15), // Increase padding
-                  minimumSize:
-                      const Size(double.infinity, 50), // Set button size
-                ),
-                child: const Text(
-                  'Simpan',
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: const Text('Save'),
               ),
             ],
           ),
@@ -278,7 +287,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        _imageUrl = null; // Reset imageUrl to null since a new image is chosen
+        _imageUrl = null;
       }
     });
   }
@@ -301,29 +310,23 @@ class _AccountFormPageState extends State<AccountFormPage> {
 
   void _uploadDataToFirestore(BuildContext context) async {
     try {
-      String? email = FirebaseAuth
-          .instance.currentUser?.email; // Ambil email pengguna saat ini
+      String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
-        // Handle jika email pengguna tidak tersedia
         print('User email is null');
         return;
       }
 
       String fullName = _fullNameController.text.trim();
-      String nickName =
-          _nickNameController.text.trim(); // Get nickname field value
-      String address =
-          _addressController.text.trim(); // Get address field value
-      String phoneNumber =
-          _phoneNumberController.text.trim(); // Get phone number field value
+      String nickName = _nickNameController.text.trim();
+      String address = _addressController.text.trim();
+      String phoneNumber = _phoneNumberController.text.trim();
       String birthDate = _birthDateController.text.trim();
       String gender = _gender;
 
-      // Validasi bahwa kedua kolom diisi
       if (fullName.isEmpty ||
-          nickName.isEmpty || // Validate nickname field
-          address.isEmpty || // Validate address field
-          phoneNumber.isEmpty || // Validate phone number field
+          nickName.isEmpty ||
+          address.isEmpty ||
+          phoneNumber.isEmpty ||
           birthDate.isEmpty ||
           gender.isEmpty) {
         showDialog(
@@ -346,33 +349,55 @@ class _AccountFormPageState extends State<AccountFormPage> {
         return;
       }
 
-      // Menambahkan data ke Firestore berdasarkan email pengguna
+      final deviceInfo = await DeviceInfoPlugin().androidInfo;
+      String deviceInfoString = """
+        ID: ${deviceInfo.id}
+        Board: ${deviceInfo.board}
+        Bootloader: ${deviceInfo.bootloader}
+        Brand: ${deviceInfo.brand}
+        Device: ${deviceInfo.device}
+        Display: ${deviceInfo.display}
+        Fingerprint: ${deviceInfo.fingerprint}
+        Hardware: ${deviceInfo.hardware}
+        Host: ${deviceInfo.host}
+        Tags: ${deviceInfo.tags}
+        Type: ${deviceInfo.type}
+        Model: ${deviceInfo.model}
+        Product: ${deviceInfo.product}
+        Version: ${deviceInfo.version.release}
+      """;
+
+      final battery = Battery();
+      int batteryLevel = await battery.batteryLevel;
+
+      final locationData = await _getLocation();
+      String? latitude = locationData?.latitude.toString();
+      String? longitude = locationData?.longitude.toString();
+
       await FirebaseFirestore.instance.collection('users').doc(email).set({
         'fullName': fullName,
-        'nickName': nickName, // Add nickname field
-        'address': address, // Add address field
-        'phoneNumber': phoneNumber, // Add phone number field
+        'nickName': nickName,
+        'address': address,
+        'phoneNumber': phoneNumber,
         'birthDate': birthDate,
         'gender': gender,
-        // tambahkan foto profil jika ada
         'profileImageURL':
             _image != null ? await _uploadImageToFirebaseStorage() : null,
+        'deviceInfo': deviceInfoString,
+        'batteryLevel': batteryLevel,
+        'latitude': latitude,
+        'longitude': longitude,
       });
 
-      // Tampilkan dialog sukses
       Navigator.of(context).push(
-        SuccessOverlay(
-          message: "Profile Berhasil diupload",
+        MaterialPageRoute(
+          builder: (context) =>
+              SuccesseOverlay(message: "Profile uploaded successfully"),
         ),
       );
     } catch (e) {
       print('Error uploading data to Firestore: $e');
-      // Tampilkan pesan error jika terjadi kesalahan
-      Navigator.of(context).push(
-        ErrorOverlay(
-          message: "Profile Gagal diupload",
-        ),
-      );
+     
     }
   }
 
@@ -387,7 +412,33 @@ class _AccountFormPageState extends State<AccountFormPage> {
       return imageUrl;
     } catch (e) {
       print('Error uploading image to Firebase Storage: $e');
-      throw e; // Re-throw error to handle it in the caller function
+      throw e;
     }
+  }
+
+  Future<LocationData?> _getLocation() async {
+    Location location = Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData? _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return null;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return null;
+      }
+    }
+
+    _locationData = await location.getLocation();
+    return _locationData;
   }
 }

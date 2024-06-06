@@ -20,7 +20,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
       if (user != null) {
         String email = user.email!;
 
-        // Mengambil dokumen pengguna berdasarkan email
+        // Get user document based on email
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(email)
@@ -29,7 +29,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
         if (userDoc.exists) {
           String fullName = userDoc['fullName'];
 
-          // Membuat dokumen pesan baru di koleksi grup chat
+          // Create a new message document in the group chat collection
           await FirebaseFirestore.instance
               .collection('groupChats')
               .doc(widget.groupId)
@@ -74,7 +74,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 0.7),
                   decoration: BoxDecoration(
-                    color: isMe ? Colors.green[200] : Colors.grey[300],
+                    color: isMe ? Colors.blue[200] : Colors.grey[300],
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -95,8 +95,26 @@ class _GroupChatPageState extends State<GroupChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Sunmolor Group Chatting'),
+      
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundImage: AssetImage('assets/images/Sunmolor.png'), // Replace with your asset image path
+            ),
+            const SizedBox(width: 10),
+            Text('Sunmolor Chat'),
+          ],
+        ),
+        actions: [
+          // IconButton(
+          //   icon: Icon(Icons.more_vert),
+          //   onPressed: () {
+          //     // Handle more options action
+          //   },
+          // ),
+        ],
       ),
       body: Column(
         children: [
@@ -134,8 +152,9 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      hintText: 'Kirimkan pesan',
+                      hintText: 'Send a message...',
                       filled: true,
+                    
                       contentPadding: const EdgeInsets.all(10),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -145,7 +164,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send),
+                  icon: const Icon(Icons.send, color: Colors.blue),
                   onPressed: () {
                     String text = _messageController.text.trim();
                     if (text.isNotEmpty) {
