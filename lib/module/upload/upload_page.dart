@@ -25,6 +25,8 @@ class _UploadPageState extends State<UploadPage> {
   double _downloadProgress = 0.0;
   Map<String, dynamic>? _selectedPhoto;
   bool _isAdmin = false;
+  List<Map<String, dynamic>> _allPhotos = [];
+  List<Map<String, dynamic>> _selectedPhotos = [];
 
   @override
   void initState() {
@@ -44,8 +46,7 @@ class _UploadPageState extends State<UploadPage> {
         if (userDoc.exists) {
           String status = userDoc['status'];
           setState(() {
-            _isAdmin = status ==
-                'admin'; // Menetapkan _isAdmin menjadi true jika status adalah 'admin'
+            _isAdmin = status == 'admin' || status == 'founder'; // Menetapkan _isAdmin menjadi true jika status adalah 'admin' atau 'founder'
           });
         }
       }
@@ -202,6 +203,24 @@ class _UploadPageState extends State<UploadPage> {
     }
   }
 
+  Future<void> _selectAllPhotos() async {
+    setState(() {
+      _selectedPhotos = List.from(_allPhotos);
+    });
+  }
+
+  Future<void> _deselectAllPhotos() async {
+    setState(() {
+      _selectedPhotos = [];
+    });
+  }
+
+  Future<void> _downloadAllSelectedPhotos() async {
+    for (var photo in _selectedPhotos) {
+      await _downloadFile(photo['url']);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,7 +234,7 @@ class _UploadPageState extends State<UploadPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (_isAdmin) // Hanya tampilkan widget Container jika pengguna memiliki status admin
+              if (_isAdmin) // Hanya tampilkan widget Container jika pengguna memiliki status admin atau founder
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
@@ -260,6 +279,7 @@ class _UploadPageState extends State<UploadPage> {
                       onChanged: (String? newValue) {
                         setState(() {
                           _selectedFolder = newValue;
+                          _selectedPhotos = [];
                         });
                       },
                       items: snapshot.data!
@@ -307,7 +327,8 @@ class _UploadPageState extends State<UploadPage> {
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: _getPhotos(_selectedFolder!),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return GridView.builder(
                         shrinkWrap: true,
                         gridDelegate:
@@ -330,100 +351,128 @@ class _UploadPageState extends State<UploadPage> {
                       );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    } else if (!snapshot.hasData ||
+                        snapshot.data!.isEmpty) {
                       return const Text('No photos in this folder yet');
                     } else {
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          var photo = snapshot.data![index];
-                          return GestureDetector(
-                            onTap: () async {
-                              setState(() {
-                                _selectedPhoto = photo;
-                              });
-                              await showDialog(
-                                context: context,
-                                builder: (context) => StatefulBuilder(
-                                  builder: (context, setState) {
-                                    return AlertDialog(
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Image.network(photo['url']),
-                                          if (_isDownloading)
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 16.0),
-                                              child: LinearProgressIndicator(
-                                                value: _downloadProgress,
-                                                minHeight: 10,
-                                                backgroundColor:
-                                                    Colors.grey[200],
-                                                valueColor:
-                                                    const AlwaysStoppedAnimation<
-                                                        Color>(Colors.blue),
-                                              ),
-                                            ),
-                                          const SizedBox(height: 10),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                      _allPhotos = List.from(snapshot.data!);
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                onPressed: _selectAllPhotos,
+                                child: const Text('Select All'),
+                              ),
+                              ElevatedButton(
+                                onPressed: _deselectAllPhotos,
+                                child: const Text('Deselect All'),
+                              ),
+                              ElevatedButton(
+                                onPressed: _downloadAllSelectedPhotos,
+                                child: const Text('Download Selected'),
+                              ),
+                            ],
+                          ),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 1,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              var photo = snapshot.data![index];
+                              return GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    _selectedPhoto = photo;
+                                  });
+                                  await showDialog(
+                                    context: context,
+                                    builder: (context) => StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return AlertDialog(
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Icon(
-                                                    Icons.close_rounded),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              ElevatedButton(
-                                                onPressed: _isDownloading
-                                                    ? null
-                                                    : () {
-                                                        _downloadFile(
-                                                            photo['url']);
-                                                      },
-                                                child: const Icon(
-                                                  Icons.file_download_rounded,
-                                                  color: Colors.green,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                             if (_isAdmin) // Hanya tampilkan tombol delete jika pengguna memiliki status admin
-                                                ElevatedButton(
-                                                  onPressed: _isDownloading
-                                                      ? null
-                                                      : () {
-                                                          _deletePhoto(context);
-                                                        },
-                                                  child: const Icon(
-                                                    Icons.delete_forever,
-                                                    color: Colors.red,
+                                              Image.network(photo['url']),
+                                              if (_isDownloading)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 16.0),
+                                                  child:
+                                                      LinearProgressIndicator(
+                                                    value: _downloadProgress,
+                                                    minHeight: 10,
+                                                    backgroundColor:
+                                                        Colors.grey[200],
+                                                    valueColor:
+                                                        const AlwaysStoppedAnimation<
+                                                            Color>(Colors.blue),
                                                   ),
                                                 ),
+                                              const SizedBox(height: 10),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Icon(
+                                                        Icons.close_rounded),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  ElevatedButton(
+                                                    onPressed:
+                                                        _isDownloading
+                                                            ? null
+                                                            : () {
+                                                                _downloadFile(
+                                                                    photo[
+                                                                        'url']);
+                                                              },
+                                                    child: const Icon(
+                                                      Icons.file_download_rounded,
+                                                      color: Colors.green,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  if (_isAdmin) // Hanya tampilkan tombol delete jika pengguna memiliki status admin atau founder
+                                                    ElevatedButton(
+                                                      onPressed: _isDownloading
+                                                          ? null
+                                                          : () {
+                                                              _deletePhoto(
+                                                                  context);
+                                                            },
+                                                      child: const Icon(
+                                                        Icons.delete_forever,
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: Image.network(photo['url']),
                               );
                             },
-                            child: Image.network(photo['url']),
-                          );
-                        },
+                          ),
+                        ],
                       );
                     }
                   },
