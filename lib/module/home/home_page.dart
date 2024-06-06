@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/account/account_page.dart';
+import 'package:sunmolor_team/module/chat/chat_page.dart';
 import 'package:sunmolor_team/module/home/home_bloc.dart';
 import 'package:sunmolor_team/module/home/home_state.dart';
 import 'package:sunmolor_team/module/upload/upload_page.dart';
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
   String joined = '';
   String? _imageUrl;
   String? _imagekendaraanUrl;
+  String? _groupId;
 
   @override
   void initState() {
@@ -47,6 +49,7 @@ class _HomePageState extends State<HomePage> {
     _loadkendaraanDataFromFirestore();
     _loadUserPoints();
     _loadProfileImage();
+    _createOrGetGroupId(); // Tambahkan ini untuk membuat atau mendapatkan ID grup chat.
   }
 
   void _loadProfileImage() async {
@@ -146,7 +149,8 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Error loading user data from Firestore: $e');
-      setState(() {
+      setState
+(() {
         loading = false;
       });
     }
@@ -169,6 +173,39 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Error loading user points from Firestore: $e');
+    }
+  }
+
+  // Fungsi untuk membuat atau mendapatkan ID grup chat.
+  void _createOrGetGroupId() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(email)
+            .get();
+        if (userDoc.exists) {
+          setState(() {
+            _groupId = userDoc['groupId'];
+          });
+          if (_groupId == null) {
+            // Jika ID grup belum ada, buat ID baru dan simpan ke Firestore.
+            String newGroupId = FirebaseFirestore.instance
+                .collection('groups')
+                .doc()
+                .id; // Membuat ID grup baru
+            FirebaseFirestore.instance.collection('users').doc(email).update(
+                {'groupId': newGroupId}); // Menyimpan ID grup ke dokumen pengguna
+            setState(() {
+              _groupId = newGroupId;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print('Error creating or getting group ID: $e');
     }
   }
 
@@ -231,7 +268,7 @@ class _HomePageState extends State<HomePage> {
         floatingActionButton: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(right:35),
+              padding: const EdgeInsets.only(right: 5),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
@@ -247,7 +284,23 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left:35),
+              padding: const EdgeInsets.only(left: 35),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: FloatingActionButton(
+                  heroTag: 'Chat',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => GroupChatPage(groupId: _groupId.toString())),
+                    );
+                  },
+                  child: const Icon(Icons.message_outlined),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 35),
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: FloatingActionButton(
@@ -384,7 +437,8 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       width: Dimensions.size100,
                       height: Dimensions.size10,
-                      decoration: BoxDecoration(
+                      decoration
+                    : BoxDecoration(
                         borderRadius: BorderRadius.circular(Dimensions.size5),
                         color: AppColors.background(),
                       ),

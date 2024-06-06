@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.dart';
 import 'package:sunmolor_team/module/auth/signup/signup_page.dart';
@@ -19,6 +20,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
+  bool _isObscure = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('isLoggedIn') == true) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    }
+  }
+
+  Future<void> _saveLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+  }
 
   Future<void> _signInWithEmailAndPassword(BuildContext context) async {
     try {
@@ -31,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _errorMessage = '';
       });
+      await _saveLoginStatus();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -68,39 +92,51 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ClipOval(
-            child: Image.asset(
-              'assets/images/Sunmolor.png', // Add your sunmolor_teamee logo image asset
-              width: 150,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SizedBox(height: Dimensions.size10),
-          const Text(
-            "Login\nSunmolor Team 2022",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
+                child: Image.asset(
+                  'assets/images/Sunmolor.png',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SizedBox(height: Dimensions.size10),
+              const Text(
+                "Login\nSunmolor Team 2022",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                      Radius.circular(20.0),
                     ),
                   ),
                 ),
               ),
-            SizedBox(height: Dimensions.size15),
+              SizedBox(height: Dimensions.size15),
               TextFormField(
                 controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
+                obscureText: _isObscure,
+                decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                    icon: Icon(
+                      _isObscure ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
                     ),
                   ),
                 ),
@@ -122,10 +158,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ElevatedButton(
                 onPressed: () => _signInWithEmailAndPassword(context),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15), // Increase padding
-                  minimumSize:
-                      const Size(double.infinity, 50), // Set button size
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  minimumSize: const Size(double.infinity, 50),
                 ),
                 child: const Text(
                   'Login',

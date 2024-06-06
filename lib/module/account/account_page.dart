@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sunmolor_team/module/account/account_form/account_form_page.dart';
 import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
@@ -24,6 +25,7 @@ class _AccountPageState extends State<AccountPage> {
   bool loading = true;
   String? _selectedAccount;
   String? _selectedStatus = 'Admin';
+  bool isFounder = false;
   List<String> _accountEmails = [];
 
   @override
@@ -31,7 +33,31 @@ class _AccountPageState extends State<AccountPage> {
     super.initState();
     _loadProfileImage();
     _loadAccountEmails();
+    _checkFounderStatus();
     _loadUserDataFromFirestore();
+  }
+
+  Widget _buildMakeAdminButton() {
+    if (isFounder) {
+      return Container(
+        width: 200,
+        child: ElevatedButton(
+          onPressed: () {
+            _showMakeAdminDialog(context);
+          },
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            minimumSize: const Size(double.infinity, 50),
+          ),
+          child: const Text(
+            'Ubah Status Member',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+      );
+    } else {
+      return SizedBox(); // Jika bukan founder, kembalikan widget kosong
+    }
   }
 
   Future<void> _loadAccountEmails() async {
@@ -47,67 +73,91 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
+  Future<void> _checkFounderStatus() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.email)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            isFounder = userDoc['status'] == 'founder';
+          });
+        }
+      } catch (e) {
+        print('Error checking founder status: $e');
+      }
+    }
+  }
+
   void _showMakeAdminDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Pilih Akun dan Status Admin"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButton<String>(
-                value: _selectedAccount,
-                hint: const Text('Pilih Akun'),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedAccount = newValue;
-                  });
-                },
-                items: _accountEmails
-                    .map<DropdownMenuItem<String>>((String email) {
-                  return DropdownMenuItem<String>(
-                    value: email,
-                    child: Text(email),
-                  );
-                }).toList(),
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return AlertDialog(
+              title: const Text("Pilih Akun dan Status"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButton<String>(
+                    value: _selectedAccount,
+                    hint: const Text('Pilih Akun'),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedAccount = newValue;
+                      });
+                    },
+                    items: _accountEmails
+                        .map<DropdownMenuItem<String>>((String email) {
+                      return DropdownMenuItem<String>(
+                        value: email,
+                        child: Text(email),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
+                  DropdownButton<String>(
+                    value: _selectedStatus,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedStatus = newValue;
+                      });
+                    },
+                    items: <String>['Admin', 'Member']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              DropdownButton<String>(
-                value: _selectedStatus,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedStatus = newValue;
-                  });
-                },
-                items: <String>['Admin', 'Non-Admin']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Batal"),
-            ),
-            TextButton(
-              onPressed: () {
-                if (_selectedAccount != null && _selectedStatus != null) {
-                  _toggleAdminStatus(
-                      _selectedAccount!, _selectedStatus == 'Admin');
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text("Simpan"),
-            ),
-          ],
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Batal"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (_selectedAccount != null && _selectedStatus != null) {
+                      _toggleAdminStatus(
+                          _selectedAccount!, _selectedStatus == 'Admin');
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text("Simpan"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -116,12 +166,12 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _toggleAdminStatus(String email, bool isAdmin) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(email).update({
-        'status': isAdmin ? 'admin' : 'nonadmin', // Update user status
+        'status': isAdmin ? 'admin' : 'member', // Update user status
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-                '$email has been set as ${isAdmin ? 'admin' : 'non-admin'}')),
+            content:
+                Text('$email has been set as ${isAdmin ? 'admin' : 'member'}')),
       );
     } catch (e) {
       print('Error toggling admin status: $e');
@@ -263,25 +313,9 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
             SizedBox(
-             
-height: 20,
+              height: 20,
             ),
-            Container(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  _showMakeAdminDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text(
-                  'Jadikan Admin',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            ),
+            _buildMakeAdminButton(),
           ],
         ),
       ),
@@ -300,39 +334,41 @@ height: 20,
       MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
     );
   }
-}
 
-void _showLogoutConfirmationDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Konfirmasi Logout"),
-        content: const Text("Apakah Anda yakin ingin logout?"),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text("Batal"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _logout(context);
-            },
-            child: const Text("Ya, Logout"),
-          ),
-        ],
-      );
-    },
-  );
-}
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi Logout"),
+          content: const Text("Apakah Anda yakin ingin logout?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Batal"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _logout(context);
+              },
+              child: const Text("Ya, Logout"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-void _logout(BuildContext context) {
-  FirebaseAuth.instance.signOut();
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const LoginScreen()),
-  );
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Bersihkan semua data dari SharedPreferences
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
 }
