@@ -20,8 +20,6 @@ class _AccountPageState extends State<AccountPage> {
   String phoneNumber = '';
   String birthDate = '';
   String gender = '';
-  String joined = '';
-  String points = "";
   bool loading = true;
   String? _selectedAccount;
   String? _selectedStatus = 'Admin';
@@ -198,8 +196,7 @@ class _AccountPageState extends State<AccountPage> {
             phoneNumber = userDoc['phoneNumber'];
             birthDate = userDoc['birthDate'];
             gender = userDoc['gender'];
-            joined = userDoc['joined'];
-            points = userDoc['points'] ?? 0;
+
             loading = false;
           });
         } else {
@@ -251,6 +248,7 @@ class _AccountPageState extends State<AccountPage> {
             Stack(
               children: [
                 CircleAvatar(
+                  backgroundColor: Colors.blue[100],
                   radius: 70,
                   backgroundImage:
                       _imageUrl != null ? NetworkImage(_imageUrl!) : null,
@@ -277,15 +275,17 @@ class _AccountPageState extends State<AccountPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[100],
                   padding: const EdgeInsets.symmetric(
                       vertical: 15), // Increase padding
                   minimumSize:
                       const Size(double.infinity, 50), // Set button size
                 ),
-                child: const Text(
-                  'Profilku',
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: const Text('Profilku',
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold)),
               ),
             ),
             SizedBox(
@@ -301,6 +301,7 @@ class _AccountPageState extends State<AccountPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[100],
                   padding: const EdgeInsets.symmetric(
                       vertical: 15), // Increase padding
                   minimumSize:
@@ -308,7 +309,10 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 child: const Text(
                   'Kendaraan saya',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
                 ),
               ),
             ),
@@ -320,10 +324,11 @@ class _AccountPageState extends State<AccountPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue[100],
         onPressed: () {
           _showLogoutConfirmationDialog(context);
         },
-        child: const Icon(Icons.door_back_door_outlined),
+        child: const Icon(Icons.logout_outlined,color: Colors.black,),
       ),
     );
   }

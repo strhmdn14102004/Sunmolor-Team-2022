@@ -101,6 +101,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
+              backgroundColor: Colors.transparent,
               backgroundImage: AssetImage('assets/images/Sunmolor.png'), // Replace with your asset image path
             ),
             const SizedBox(width: 10),
@@ -150,6 +151,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
               children: [
                 Expanded(
                   child: TextField(
+                  
                     controller: _messageController,
                     decoration: InputDecoration(
                       hintText: 'Send a message...',

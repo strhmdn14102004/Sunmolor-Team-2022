@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
+import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
 
@@ -358,13 +359,16 @@ _fullNameController,
       'kendaraanImageURL': _image != null ? await _uploadImageToFirebaseStorage() : null,
     });
 
-    Navigator.of(context).pop(); // Close progress indicator
-
-    Navigator.of(context).push(
-      SuccessOverlay(
-        message: "Data Kendaraan Berhasil diupload",
-      ),
-    );
+     Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+            builder: (context) => LoginScreen()), // Navigate back to login
+      );
+      Navigator.of(context).push(
+        SuccessOverlay(
+          message:
+              "Akun Berhasil dibuat, Login untuk masuk",
+        ),
+      );
   } catch (e) {
     print('Error uploading data to Firestore: $e');
     Navigator.of(context).pop(); // Close progress indicator

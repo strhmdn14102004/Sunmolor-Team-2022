@@ -88,99 +88,101 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ClipOval(
-                child: Image.asset(
-                  'assets/images/Sunmolor.png',
-                  width: 150,
-                  height: 150,
-                  fit: BoxFit.cover,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ClipOval(
+                  child: Image.asset(
+                    'assets/images/Sunmolor.png',
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              SizedBox(height: Dimensions.size10),
-              const Text(
-                "Login\nSunmolor Team 2022",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
+                SizedBox(height: Dimensions.size10),
+                const Text(
+                  "Login\nSunmolor Team 2022",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: Dimensions.size15),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _isObscure,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
+                SizedBox(height: Dimensions.size15),
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: _isObscure,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0),
+                      ),
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
+                      icon: Icon(
+                        _isObscure ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
-                  suffixIcon: IconButton(
+                ),
+                SizedBox(height: Dimensions.size5),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: TextButton(
                     onPressed: () {
-                      setState(() {
-                        _isObscure = !_isObscure;
-                      });
+                      _navigateToForgotPassword(context);
                     },
-                    icon: Icon(
-                      _isObscure ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.grey,
+                    child: const Text(
+                      'Lupa Password?',
+                      style: TextStyle(),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: Dimensions.size5),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
+                SizedBox(height: Dimensions.size15),
+                ElevatedButton(
+                  onPressed: () => _signInWithEmailAndPassword(context),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const SizedBox(height: 10),
+                TextButton(
                   onPressed: () {
-                    _navigateToForgotPassword(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SignUp()),
+                    );
                   },
                   child: const Text(
-                    'Lupa Password?',
+                    'Belum punya akun? Daftar Sekarang',
                     style: TextStyle(),
                   ),
                 ),
-              ),
-              SizedBox(height: Dimensions.size15),
-              ElevatedButton(
-                onPressed: () => _signInWithEmailAndPassword(context),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              const SizedBox(height: 10),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SignUp()),
-                  );
-                },
-                child: const Text(
-                  'Belum punya akun? Daftar Sekarang',
-                  style: TextStyle(),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

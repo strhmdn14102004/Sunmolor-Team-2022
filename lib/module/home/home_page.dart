@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/account/account_page.dart';
@@ -36,10 +38,13 @@ class _HomePageState extends State<HomePage> {
   int points = 0;
   File? profileImage;
   File? kendaraanImage;
-  String joined = '';
+  List<String> _accountEmails = [];
   String? _imageUrl;
   String? _imagekendaraanUrl;
   String? _groupId;
+  File? backgroundImage;
+
+  String? _backgroundImageUrl;
 
   @override
   void initState() {
@@ -49,7 +54,103 @@ class _HomePageState extends State<HomePage> {
     _loadkendaraanDataFromFirestore();
     _loadUserPoints();
     _loadProfileImage();
+    _loadBackgroundImage();
     _createOrGetGroupId(); // Tambahkan ini untuk membuat atau mendapatkan ID grup chat.
+  }
+
+  void _loadBackgroundImage() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(email)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            _backgroundImageUrl = userDoc['backgroundImageURL'];
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading background image: $e');
+    }
+  }
+
+  Future<void> _loadAccountEmails() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('users').get();
+      setState(() {
+        _accountEmails =
+            snapshot.docs.map((doc) => doc.id).toList(); // Get email addresses
+      });
+    } catch (e) {
+      print('Error loading account emails: $e');
+    }
+  }
+
+  Future<void> _uploadPhoto(File imageFile) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+
+        CollectionReference userCollection =
+            FirebaseFirestore.instance.collection('users');
+
+        DocumentReference userDocRef = userCollection.doc(email);
+
+        String photoURL = await _uploadImage(imageFile);
+        await userDocRef.update({'backgroundImageURL': photoURL});
+
+        _loadBackgroundImage();
+      }
+    } catch (e) {
+      print('Error uploading photo: $e');
+    }
+  }
+
+  Future<String> _uploadImage(File imageFile) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+
+        // Get reference to Firebase Storage
+        Reference storageRef =
+            FirebaseStorage.instance.ref().child('background_images/$email');
+
+        // Upload the photo to Firebase Storage
+        UploadTask uploadTask = storageRef.putFile(imageFile);
+
+        // Wait for the upload process to complete
+        TaskSnapshot taskSnapshot = await uploadTask;
+
+        // Get the download URL of the photo after it's successfully uploaded
+        String downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+        return downloadURL;
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+      throw Exception('Failed to upload image');
+    }
+    return '';
+  }
+
+  // Function to pick image from gallery
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        backgroundImage = File(image.path);
+      });
+      await _uploadPhoto(backgroundImage!);
+    }
   }
 
   void _loadProfileImage() async {
@@ -113,7 +214,6 @@ class _HomePageState extends State<HomePage> {
             phoneNumber = userDoc['phoneNumber'];
             birthDate = userDoc['birthDate'];
             gender = userDoc['gender'];
-            joined = userDoc['joined'];
             points = userDoc['points'] ?? 0;
           });
         }
@@ -149,8 +249,7 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Error loading user data from Firestore: $e');
-      setState
-(() {
+      setState(() {
         loading = false;
       });
     }
@@ -196,8 +295,9 @@ class _HomePageState extends State<HomePage> {
                 .collection('groups')
                 .doc()
                 .id; // Membuat ID grup baru
-            FirebaseFirestore.instance.collection('users').doc(email).update(
-                {'groupId': newGroupId}); // Menyimpan ID grup ke dokumen pengguna
+            FirebaseFirestore.instance.collection('users').doc(email).update({
+              'groupId': newGroupId
+            }); // Menyimpan ID grup ke dokumen pengguna
             setState(() {
               _groupId = newGroupId;
             });
@@ -225,43 +325,48 @@ class _HomePageState extends State<HomePage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.transparent,
           centerTitle: true,
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
+              const Expanded(
                 child: Text(
-                  "Sunmolor Team",
+                  "Sunmolor Team 2022",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               Row(
                 children: [
-                  Icon(
-                    Icons.monetization_on,
-                    color: Colors.yellow,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    points.toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  IconButton(
+                      onPressed: _pickImage,
+                      icon: Icon(Icons.wallpaper_outlined))
                 ],
               ),
             ],
           ),
         ),
-        body: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              _loadUserDataFromFirestore();
-              _loadkendaraanDataFromFirestore();
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: body(),
+        body: Container(
+          decoration: BoxDecoration(
+            image: _backgroundImageUrl != null
+                ? DecorationImage(
+                    image: NetworkImage(_backgroundImageUrl!),
+                    fit: BoxFit.cover)
+                : null,
+          ),
+          child: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                _loadUserDataFromFirestore();
+                _loadkendaraanDataFromFirestore();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Container(
+                    height: MediaQuery.of(context).size.height, child: body()),
+              ),
             ),
           ),
         ),
@@ -272,6 +377,7 @@ class _HomePageState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
+                  backgroundColor: Colors.blue[100],
                   heroTag: 'account',
                   onPressed: () {
                     Navigator.push(
@@ -288,14 +394,17 @@ class _HomePageState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: FloatingActionButton(
+                  backgroundColor: Colors.blue[100],
                   heroTag: 'Chat',
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => GroupChatPage(groupId: _groupId.toString())),
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              GroupChatPage(groupId: _groupId.toString())),
                     );
                   },
-                  child: const Icon(Icons.message_outlined),
+                  child: const Icon(Icons.chat_bubble_outline),
                 ),
               ),
             ),
@@ -304,6 +413,7 @@ class _HomePageState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: FloatingActionButton(
+                  backgroundColor: Colors.blue[100],
                   heroTag: 'upload',
                   onPressed: () {
                     Navigator.push(
@@ -334,6 +444,7 @@ class _HomePageState extends State<HomePage> {
               width: Dimensions.size100 * 2,
               repeat: true,
             ),
+            const Text("Tunggu data sedang dimuat")
           ],
         ),
       );
@@ -347,12 +458,13 @@ class _HomePageState extends State<HomePage> {
               Stack(
                 children: [
                   CircleAvatar(
+                    backgroundColor: Colors.blue[100],
                     radius: 70,
                     backgroundImage:
                         _imageUrl != null ? NetworkImage(_imageUrl!) : null,
                   ),
                   if (_imageUrl == null)
-                    Positioned.fill(
+                    const Positioned.fill(
                       child: CircularProgressIndicator(),
                     ),
                 ],
@@ -377,40 +489,85 @@ class _HomePageState extends State<HomePage> {
                     Stack(
                       children: [
                         CircleAvatar(
+                          backgroundColor: Colors.blue[100],
                           radius: 30,
                           backgroundImage: _imagekendaraanUrl != null
                               ? NetworkImage(_imagekendaraanUrl!)
                               : null,
                         ),
                         if (_imagekendaraanUrl == null)
-                          Positioned.fill(
+                          const Positioned.fill(
                             child: CircularProgressIndicator(),
                           ),
                       ],
                     ),
                     SizedBox(width: Dimensions.size20),
                     Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            nama_kendaraan.isNotEmpty
-                                ? nama_kendaraan
-                                : 'Perbarui Info kendaraan',
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          Text(Nomor_polisi_kendaraan.isNotEmpty
-                              ? Nomor_polisi_kendaraan
-                              : 'Isi data kendaraan terlebih dahulu'),
-                          Text(Exp_pajak.isNotEmpty
-                              ? Exp_pajak
-                              : 'Isi data kendaraan terlebih dahulu')
-                        ],
+                      child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              nama_kendaraan.isNotEmpty
+                                  ? nama_kendaraan
+                                  : 'Perbarui Info kendaraan',
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            Text(Nomor_polisi_kendaraan.isNotEmpty
+                                ? Nomor_polisi_kendaraan
+                                : 'Isi data kendaraan terlebih dahulu'),
+                            Text(Exp_pajak.isNotEmpty
+                                ? Exp_pajak
+                                : 'Isi data kendaraan terlebih dahulu')
+                          ],
+                        ),
                       ),
                     ),
                   ],
+                ),
+              ),
+              SizedBox(height: Dimensions.size20),
+              Container(
+                height: 200,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Terjadi kesalahan: ${snapshot.error}'),
+                      );
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return Center(
+                        child: Text('Tidak ada data pengguna.'),
+                      );
+                    }
+                    List<String> emails = _accountEmails ?? [];
+                    if (_accountEmails == null) {
+                      emails =
+                          snapshot.data!.docs.map((doc) => doc.id).toList();
+                    }
+                    return ListView.builder(
+                      itemCount: emails.length,
+                      itemBuilder: (context, index) {
+                        var email = emails[index];
+                        return ListTile(
+                          title: Text(email),
+                          subtitle: Text(email),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ],
@@ -437,8 +594,7 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       width: Dimensions.size100,
                       height: Dimensions.size10,
-                      decoration
-                    : BoxDecoration(
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(Dimensions.size5),
                         color: AppColors.background(),
                       ),

@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as Path;
 import 'package:shimmer/shimmer.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
+import 'package:sunmolor_team/overlay/success_overlay.dart';
 
 class UploadPage extends StatefulWidget {
   @override
@@ -46,7 +47,9 @@ class _UploadPageState extends State<UploadPage> {
         if (userDoc.exists) {
           String status = userDoc['status'];
           setState(() {
-            _isAdmin = status == 'admin' || status == 'founder'; // Menetapkan _isAdmin menjadi true jika status adalah 'admin' atau 'founder'
+            _isAdmin = status == 'admin' ||
+                status ==
+                    'founder'; // Menetapkan _isAdmin menjadi true jika status adalah 'admin' atau 'founder'
           });
         }
       }
@@ -96,16 +99,16 @@ class _UploadPageState extends State<UploadPage> {
         _uploadProgress = 0.0;
       });
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => SuccesseOverlay(
-            message: "File Berhasil Diupload",
-          ),
+      Navigator.of(context).push(
+        SuccessOverlay(
+          message: "Photo Berhasil Di Upload",
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a folder and an image.')),
+        const SnackBar(
+            content: Text(
+                'Tidak ada photo untuk diupload,\nPilih foto terlebih dahulu.')),
       );
     }
   }
@@ -119,11 +122,9 @@ class _UploadPageState extends State<UploadPage> {
       _selectedFolder = folderName;
     });
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => SuccesseOverlay(
-          message: "File Berhasil Diupload",
-        ),
+    Navigator.of(context).push(
+      SuccessOverlay(
+        message: "Folder Berhasil Dibuat",
       ),
     );
   }
@@ -226,7 +227,56 @@ class _UploadPageState extends State<UploadPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Upload Photo Sunmolor Team'),
+        title: const Text('Upload Photo'),
+        actions: [
+          PopupMenuButton<int>(
+            onSelected: (item) async {
+              switch (item) {
+                case 0:
+                  await _selectAllPhotos();
+                  break;
+                case 1:
+                  await _deselectAllPhotos();
+                  break;
+                case 2:
+                  await _downloadAllSelectedPhotos();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<int>(
+                value: 0,
+                child: Row(
+                  children: const [
+                    Icon(Icons.select_all_outlined, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text('Pilih Semua'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 1,
+                child: Row(
+                  children: const [
+                    Icon(Icons.cancel_outlined, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text('Batalkan Pilihan'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 2,
+                child: Row(
+                  children: const [
+                    Icon(Icons.download, color: Colors.black),
+                    SizedBox(width: 8),
+                    Text('Download Semua yang dipilih'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -237,19 +287,19 @@ class _UploadPageState extends State<UploadPage> {
               if (_isAdmin) // Hanya tampilkan widget Container jika pengguna memiliki status admin atau founder
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey,
-                  ),
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.grey[300]),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     controller: _folderController,
                     decoration: InputDecoration(
                       labelText: 'Masukan Nama Folder',
-                      labelStyle: const TextStyle(color: Colors.black),
+                      labelStyle: const TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
                       border: InputBorder.none,
                       suffixIcon: IconButton(
                         icon: const Icon(
-                          Icons.add,
+                          Icons.create_new_folder_outlined,
                           color: Colors.black,
                         ),
                         onPressed: () {
@@ -295,7 +345,7 @@ class _UploadPageState extends State<UploadPage> {
               ),
               const SizedBox(height: 20),
               _image == null
-                  ? const Text('No photo selected to upload.')
+                  ? const Text('Tidak ada photo untuk diupload.')
                   : Image.file(_image!),
               const SizedBox(height: 20),
               if (_uploadProgress > 0)
@@ -310,15 +360,25 @@ class _UploadPageState extends State<UploadPage> {
                   ),
                 ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[100],
+                    ),
                     onPressed: _pickImage,
-                    child: const Text('Choose Photo'),
+                    child: const Icon(Icons.photo_library_rounded,
+                        color: Colors.black),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[100],
+                    ),
                     onPressed: _uploadFile,
-                    child: const Text('Upload Photo'),
+                    child: const Icon(
+                      Icons.upload_file_outlined,
+                      color: Colors.black,
+                    ),
                   ),
                 ],
               ),
@@ -327,8 +387,7 @@ class _UploadPageState extends State<UploadPage> {
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: _getPhotos(_selectedFolder!),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return GridView.builder(
                         shrinkWrap: true,
                         gridDelegate:
@@ -351,33 +410,15 @@ class _UploadPageState extends State<UploadPage> {
                       );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
-                    } else if (!snapshot.hasData ||
-                        snapshot.data!.isEmpty) {
-                      return const Text('No photos in this folder yet');
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text('Tidak ada photo di folder ini');
                     } else {
                       _allPhotos = List.from(snapshot.data!);
                       return Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton(
-                                onPressed: _selectAllPhotos,
-                                child: const Text('Select All'),
-                              ),
-                              ElevatedButton(
-                                onPressed: _deselectAllPhotos,
-                                child: const Text('Deselect All'),
-                              ),
-                              ElevatedButton(
-                                onPressed: _downloadAllSelectedPhotos,
-                                child: const Text('Download Selected'),
-                              ),
-                            ],
-                          ),
                           GridView.builder(
                             shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
@@ -388,10 +429,15 @@ class _UploadPageState extends State<UploadPage> {
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
                               var photo = snapshot.data![index];
+                              bool isSelected = _selectedPhotos.contains(photo);
                               return GestureDetector(
                                 onTap: () async {
                                   setState(() {
-                                    _selectedPhoto = photo;
+                                    if (isSelected) {
+                                      _selectedPhotos.remove(photo);
+                                    } else {
+                                      _selectedPhotos.add(photo);
+                                    }
                                   });
                                   await showDialog(
                                     context: context,
@@ -432,16 +478,15 @@ class _UploadPageState extends State<UploadPage> {
                                                   ),
                                                   const SizedBox(width: 10),
                                                   ElevatedButton(
-                                                    onPressed:
-                                                        _isDownloading
-                                                            ? null
-                                                            : () {
-                                                                _downloadFile(
-                                                                    photo[
-                                                                        'url']);
-                                                              },
+                                                    onPressed: _isDownloading
+                                                        ? null
+                                                        : () {
+                                                            _downloadFile(
+                                                                photo['url']);
+                                                          },
                                                     child: const Icon(
-                                                      Icons.file_download_rounded,
+                                                      Icons
+                                                          .file_download_rounded,
                                                       color: Colors.green,
                                                     ),
                                                   ),
@@ -468,7 +513,15 @@ class _UploadPageState extends State<UploadPage> {
                                     ),
                                   );
                                 },
-                                child: Image.network(photo['url']),
+                                child: ColorFiltered(
+                                  colorFilter: ColorFilter.mode(
+                                    isSelected
+                                        ? Colors.grey
+                                        : Colors.transparent,
+                                    BlendMode.saturation,
+                                  ),
+                                  child: Image.network(photo['url']),
+                                ),
                               );
                             },
                           ),
