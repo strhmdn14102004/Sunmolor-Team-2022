@@ -61,6 +61,8 @@ class _AccountPageState extends State<AccountPage> {
   Widget _buildMakeAdminButton() {
     if (isFounder) {
       return Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20), color: Colors.blue[100]),
         width: 200,
         child: ElevatedButton(
           onPressed: () {
@@ -72,7 +74,8 @@ class _AccountPageState extends State<AccountPage> {
           ),
           child: const Text(
             'Ubah Status Member',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
           ),
         ),
       );

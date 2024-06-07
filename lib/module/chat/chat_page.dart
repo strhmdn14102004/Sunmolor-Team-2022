@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sunmolor_team/helper/dimension.dart';
 
 class GroupChatPage extends StatefulWidget {
   final String groupId;
@@ -133,8 +134,18 @@ class _GroupChatPageState extends State<GroupChatPage> {
                     },
                   );
                 } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(
+                          height: Dimensions.size10,
+                        ),
+                        Text("Tunggu sebentar pesan sedang dimuat")
+                      ],
+                    ),
                   );
                 }
               },

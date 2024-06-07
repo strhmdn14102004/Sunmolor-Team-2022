@@ -464,6 +464,7 @@ class _HomePageState extends State<HomePage> {
                     : 'Lengkapi Datamu terlebih dahulu',
                 style:
                     const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: Dimensions.size20),
               Container(

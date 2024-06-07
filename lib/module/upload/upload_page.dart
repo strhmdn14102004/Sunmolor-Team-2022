@@ -319,35 +319,37 @@ class _UploadPageState extends State<UploadPage> {
                   ),
                 ),
               const SizedBox(height: 20),
-              FutureBuilder<List<String>>(
-                future: _getFolders(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('No folders available');
-                  } else {
-                    return DropdownButton<String>(
-                      value: _selectedFolder,
-                      hint: const Text('Pilih Folder'),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedFolder = newValue;
-                          _selectedPhotos = [];
-                        });
-                      },
-                      items: snapshot.data!
-                          .map<DropdownMenuItem<String>>((String folder) {
-                        return DropdownMenuItem<String>(
-                          value: folder,
-                          child: Text(folder),
-                        );
-                      }).toList(),
-                    );
-                  }
-                },
+              Center(
+                child: FutureBuilder<List<String>>(
+                  future: _getFolders(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text('No folders available');
+                    } else {
+                      return DropdownButton<String>(
+                        value: _selectedFolder,
+                        hint: const Text('Pilih Folder'),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedFolder = newValue;
+                            _selectedPhotos = [];
+                          });
+                        },
+                        items: snapshot.data!
+                            .map<DropdownMenuItem<String>>((String folder) {
+                          return DropdownMenuItem<String>(
+                            value: folder,
+                            child: Text(folder),
+                          );
+                        }).toList(),
+                      );
+                    }
+                  },
+                ),
               ),
               const SizedBox(height: 20),
               _image == null
@@ -365,29 +367,30 @@ class _UploadPageState extends State<UploadPage> {
                         const AlwaysStoppedAnimation<Color>(Colors.blue),
                   ),
                 ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
+              if (_isAdmin)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue[100],
+                      ),
+                      onPressed: _pickImage,
+                      child: const Icon(Icons.photo_library_rounded,
+                          color: Colors.black),
                     ),
-                    onPressed: _pickImage,
-                    child: const Icon(Icons.photo_library_rounded,
-                        color: Colors.black),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue[100],
+                      ),
+                      onPressed: _uploadFile,
+                      child: const Icon(
+                        Icons.upload_file_outlined,
+                        color: Colors.black,
+                      ),
                     ),
-                    onPressed: _uploadFile,
-                    child: const Icon(
-                      Icons.upload_file_outlined,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(height: 20),
               if (_selectedFolder != null)
                 FutureBuilder<List<Map<String, dynamic>>>(
