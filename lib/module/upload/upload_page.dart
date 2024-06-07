@@ -181,11 +181,11 @@ class _UploadPageState extends State<UploadPage> {
     );
   }
 
-  Future<void> _deletePhoto(BuildContext context) async {
-    if (_selectedFolder != null && _selectedPhoto != null) {
+  Future<void> _deletePhoto(
+      BuildContext context, Map<String, dynamic> photo) async {
+    if (_selectedFolder != null && photo != null) {
       // Hapus foto dari Firebase Storage
-      final Reference ref =
-          FirebaseStorage.instance.refFromURL(_selectedPhoto!['url']);
+      final Reference ref = FirebaseStorage.instance.refFromURL(photo['url']);
       await ref.delete();
 
       // Hapus catatan foto dari Firestore
@@ -193,14 +193,20 @@ class _UploadPageState extends State<UploadPage> {
           .collection('uploads')
           .doc(_selectedFolder)
           .collection('images')
-          .doc(_selectedPhoto!['id'])
+          .doc(photo['id'])
           .delete();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Photo deleted successfully')),
-      );
+      setState(() {
+        _allPhotos.remove(photo);
+        _selectedPhotos.remove(photo);
+      });
 
       Navigator.pop(context);
+      Navigator.of(context).push(
+        SuccessOverlay(
+          message: "Photo Berhasil Dihapus",
+        ),
+      );
     }
   }
 
@@ -497,7 +503,8 @@ class _UploadPageState extends State<UploadPage> {
                                                           ? null
                                                           : () {
                                                               _deletePhoto(
-                                                                  context);
+                                                                  context,
+                                                                  photo);
                                                             },
                                                       child: const Icon(
                                                         Icons.delete_forever,
