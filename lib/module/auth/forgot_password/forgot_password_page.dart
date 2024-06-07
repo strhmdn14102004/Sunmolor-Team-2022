@@ -27,7 +27,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       Navigator.of(context).push(
         SuccessOverlay(
           message:
-              "Reset Berhasil, Link Reset Password Dikirimkan Ke email kamu.",
+              "Link Reset Password Berhasil Dikirimkan Ke Email Kamu.",
         ),
       );
       Navigator.of(context).pushReplacement(
@@ -37,7 +37,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         Navigator.of(context).push(
         SuccessOverlay(
           message:
-              "Reset Berhasil, Link Reset Password Dikirimkan Ke email kamu.",
+              "Link Reset Password Berhasil Dikirimkan Ke Email Kamu.",
         ),
       );
     } catch (e) {

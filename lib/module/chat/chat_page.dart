@@ -95,27 +95,22 @@ class _GroupChatPageState extends State<GroupChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.transparent,
-              backgroundImage: AssetImage('assets/images/Sunmolor.png'), // Replace with your asset image path
-            ),
-            const SizedBox(width: 10),
-            Text('Sunmolor Chat'),
-          ],
+        title: const Padding(
+          padding: EdgeInsets.only(right: 35),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.transparent,
+                backgroundImage: AssetImage(
+                    'assets/images/Sunmolor.png'), // Replace with your asset image path
+              ),
+              SizedBox(width: 10),
+              Text('Sunmolor Team Chat'),
+            ],
+          ),
         ),
-        actions: [
-          // IconButton(
-          //   icon: Icon(Icons.more_vert),
-          //   onPressed: () {
-          //     // Handle more options action
-          //   },
-          // ),
-        ],
       ),
       body: Column(
         children: [
@@ -150,23 +145,28 @@ class _GroupChatPageState extends State<GroupChatPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                  
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Send a message...',
-                      filled: true,
-                    
-                      contentPadding: const EdgeInsets.all(10),
-                      border: OutlineInputBorder(
+                  child: Container(
+                    decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
+                        color: Colors.black45),
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        fillColor: Colors.black26,
+                        hintText: 'Send a message...',
+                        hintStyle: const TextStyle(color: Colors.white),
+                        filled: true,
+                        contentPadding: const EdgeInsets.all(10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blue),
+                  icon: const Icon(Icons.send, color: Colors.black),
                   onPressed: () {
                     String text = _messageController.text.trim();
                     if (text.isNotEmpty) {

@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.of(context).push(
         ErrorOverlay(
-          message: "Login Gagal, Periksa Kembali Password Kamu",
+          message: "Login Gagal\nPeriksa Kembali Password Kamu",
         ),
       );
     }
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: Dimensions.size10),
                 const Text(
-                  "Login\nSunmolor Team 2022",
+                  "Login\nSunmolor Team",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                   textAlign: TextAlign.center,
                 ),
