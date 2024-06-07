@@ -149,13 +149,13 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                   _selectImage(context);
                 },
                 child: CircleAvatar(
-                radius: 70,
-                backgroundImage: _image != null
-                    ? FileImage(_image!) as ImageProvider<Object>?
-                    : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
+                  radius: 70,
+                  backgroundImage: _image != null
+                      ? FileImage(_image!) as ImageProvider<Object>?
+                      : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
+                ),
               ),
-            
-              ), SizedBox(height: Dimensions.size10),
+              SizedBox(height: Dimensions.size10),
               Text("Klik image untuk mengupload photo profile"),
               SizedBox(height: Dimensions.size30),
               TextFormField(
@@ -302,78 +302,62 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
 
   void _uploadDataToFirestore(BuildContext context) async {
     try {
-      String? email = FirebaseAuth
-          .instance.currentUser?.email; // Ambil email pengguna saat ini
+      String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
-        // Handle jika email pengguna tidak tersedia
         print('User email is null');
         return;
       }
 
       String fullName = _fullNameController.text.trim();
-      String nickName =
-          _nickNameController.text.trim(); // Get nickname field value
-      String address =
-          _addressController.text.trim(); // Get address field value
-      String phoneNumber =
-          _phoneNumberController.text.trim(); // Get phone number field value
+      String nickName = _nickNameController.text.trim();
+      String address = _addressController.text.trim();
+      String phoneNumber = _phoneNumberController.text.trim();
       String birthDate = _birthDateController.text.trim();
       String gender = _gender;
 
-      // Validasi bahwa kedua kolom diisi
+      // Validate that all fields are filled
       if (fullName.isEmpty ||
-          nickName.isEmpty || // Validate nickname field
-          address.isEmpty || // Validate address field
-          phoneNumber.isEmpty || // Validate phone number field
+          nickName.isEmpty ||
+          address.isEmpty ||
+          phoneNumber.isEmpty ||
           birthDate.isEmpty ||
           gender.isEmpty) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const Text('Please fill in all fields.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
+        Navigator.of(context).push(
+          ErrorOverlay(
+            message: "Isi data diri terlebih dahulu",
+          ),
         );
-        return;
+
+        return; // Stop execution if any field is empty
       }
 
-      // Menambahkan data ke Firestore berdasarkan email pengguna
+      // Add data to Firestore
       await FirebaseFirestore.instance.collection('users').doc(email).set({
         'fullName': fullName,
-        'nickName': nickName, // Add nickname field
-        'address': address, // Add address field
-        'phoneNumber': phoneNumber, // Add phone number field
+        'nickName': nickName,
+        'address': address,
+        'phoneNumber': phoneNumber,
         'birthDate': birthDate,
         'gender': gender,
-        // tambahkan foto profil jika ada
         'profileImageURL':
             _image != null ? await _uploadImageToFirebaseStorage() : null,
       });
 
-      // Tampilkan dialog sukses
-     Navigator.of(context).pushReplacement(
+      // Navigate to the next page after successful upload
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-            builder: (context) => VerifyDataKendaraanPage()), // Navigate back to login
+          builder: (context) => VerifyDataKendaraanPage(),
+        ),
       );
+      // Show success overlay
       Navigator.of(context).push(
         SuccessOverlay(
-          message:
-              "Akun Berhasil dibuat, Login untuk masuk",
+          message: "Data diri berhasil disimpan\nLanjutkan Isi Informasi Kendaraan kamu",
         ),
       );
     } catch (e) {
       print('Error uploading data to Firestore: $e');
-      // Tampilkan pesan error jika terjadi kesalahan
+      // Show error overlay
       Navigator.of(context).push(
         ErrorOverlay(
           message: "Profile Gagal diupload",

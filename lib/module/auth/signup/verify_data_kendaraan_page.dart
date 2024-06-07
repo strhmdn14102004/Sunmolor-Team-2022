@@ -284,88 +284,82 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
     }
   }
 
-  void _uploadDataToFirestore(BuildContext context) async {
-    try {
-      String? email = FirebaseAuth.instance.currentUser?.email;
-      if (email == null) {
-        print('User email is null');
-        return;
-      }
-
-      String fullName = _fullNameController.text.trim();
-      String nickName = _nickNameController.text.trim();
-      String phoneNumber = _phoneNumberController;
-      String birthDate = _birthDateController.text.trim();
-      String gender = _gender;
-
-      if (fullName.isEmpty ||
-          nickName.isEmpty ||
-          phoneNumber.isEmpty ||
-          birthDate.isEmpty ||
-          gender.isEmpty) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const Text('Please fill in all fields.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(
-            child: CircularProgressIndicator(
-              value: null,
-              strokeWidth: 6, // Thickness of the circular progress
-            ),
-          );
-        },
-      );
-
-      await FirebaseFirestore.instance.collection('kendaraan').doc(email).set({
-        'Nama Kendaraan': fullName,
-        'Nomor Polisi Kendaraan': nickName,
-        'Exp Pajak Kendaraan': birthDate,
-        'Jenis BBM': phoneNumber,
-        'Pabrikan Asal': gender,
-        'kendaraanImageURL':
-            _image != null ? await _uploadImageToFirebaseStorage() : null,
-      });
-
-     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (context) => LoginScreen()), // Navigate back to login
-      );
-      Navigator.of(context).push(
-        SuccessOverlay(
-          message:
-              "Data Kendaraan Berhasil Diupload\nRegister Akun Berhasil",
-        ),
-      );
-    } catch (e) {
-      print('Error uploading data to Firestore: $e');
-      Navigator.of(context).pop(); // Close progress indicator
-      Navigator.of(context).push(
-        ErrorOverlay(
-          message: "Profile Gagal diupload",
-        ),
-      );
+ void _uploadDataToFirestore(BuildContext context) async {
+  try {
+    String? email = FirebaseAuth.instance.currentUser?.email;
+    if (email == null) {
+      print('User email is null');
+      return;
     }
+
+    String fullName = _fullNameController.text.trim();
+    String nickName = _nickNameController.text.trim();
+    String phoneNumber = _phoneNumberController;
+    String birthDate = _birthDateController.text.trim();
+    String gender = _gender;
+
+    // Validasi bahwa semua kolom harus diisi
+    if (fullName.isEmpty ||
+        nickName.isEmpty ||
+        phoneNumber.isEmpty ||
+        birthDate.isEmpty ||
+        gender.isEmpty) {
+      Navigator.of(context).push(
+          ErrorOverlay(
+            message: "Isi data kendaraan terlebih dahulu",
+          ),
+        );
+      return; // Hentikan eksekusi jika ada kolom yang kosong
+    }
+
+    // Menampilkan dialog indikator progres
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(
+            value: null,
+            strokeWidth: 6, // Ketebalan progres lingkaran
+          ),
+        );
+      },
+    );
+
+    // Menyimpan data ke Firestore
+    await FirebaseFirestore.instance.collection('kendaraan').doc(email).set({
+      'Nama Kendaraan': fullName,
+      'Nomor Polisi Kendaraan': nickName,
+      'Exp Pajak Kendaraan': birthDate,
+      'Jenis BBM': phoneNumber,
+      'Pabrikan Asal': gender,
+      'kendaraanImageURL': _image != null ? await _uploadImageToFirebaseStorage() : null,
+    });
+
+    // Navigasi kembali ke halaman login setelah pengunggahan berhasil
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ),
+    );
+
+    // Tampilkan overlay kesuksesan
+    Navigator.of(context).push(
+      SuccessOverlay(
+        message: "Data Kendaraan Berhasil Diupload\nRegister Akun Berhasil",
+      ),
+    );
+  } catch (e) {
+    print('Error uploading data to Firestore: $e');
+    Navigator.of(context).pop(); // Tutup indikator progres
+    Navigator.of(context).push(
+      ErrorOverlay(
+        message: "Profile Gagal diupload",
+      ),
+    );
   }
+}
+
 
   Future<String> _uploadImageToFirebaseStorage() async {
     try {
