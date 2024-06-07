@@ -79,7 +79,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 SizedBox(height: Dimensions.size10),
                 Text(
-                  "Daftar Akun Baru\nSunmolor Team",
+                  "Daftar Akun\nSunmolor Team",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
                   textAlign: TextAlign.center,
                 ),

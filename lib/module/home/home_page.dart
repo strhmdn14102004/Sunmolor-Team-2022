@@ -471,7 +471,7 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(20),
-                    color: Colors.black),
+                    color: Colors.black54),
                 child: Row(
                   children: [
                     Stack(
