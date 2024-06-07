@@ -25,6 +25,7 @@ class _AccountPageState extends State<AccountPage> {
   String? _selectedStatus = 'Admin';
   bool isFounder = false;
   List<String> _accountEmails = [];
+  String? _backgroundImageUrl;
 
   @override
   void initState() {
@@ -32,7 +33,29 @@ class _AccountPageState extends State<AccountPage> {
     _loadProfileImage();
     _loadAccountEmails();
     _checkFounderStatus();
+    _loadBackgroundImage();
     _loadUserDataFromFirestore();
+  }
+
+  void _loadBackgroundImage() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(email)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            _backgroundImageUrl = userDoc['backgroundImageURL'];
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading background image: $e');
+    }
   }
 
   Widget _buildMakeAdminButton() {
@@ -241,86 +264,98 @@ class _AccountPageState extends State<AccountPage> {
     String email = user != null ? user.email ?? "" : "";
 
     return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          children: [
-            Stack(
+      body: Container(
+        decoration: BoxDecoration(
+          image: _backgroundImageUrl != null
+              ? DecorationImage(
+                  image: NetworkImage(_backgroundImageUrl!), fit: BoxFit.cover)
+              : null,
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 100),
+            child: Column(
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.blue[100],
-                  radius: 70,
-                  backgroundImage:
-                      _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.blue[100],
+                      radius: 70,
+                      backgroundImage:
+                          _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                    ),
+                    if (_imageUrl == null)
+                      Positioned.fill(
+                        child: CircularProgressIndicator(),
+                      ),
+                  ],
                 ),
-                if (_imageUrl == null)
-                  Positioned.fill(
-                    child: CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Text(
+                  fullName.isNotEmpty ? fullName : email,
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AccountFormPage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[100],
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15), // Increase padding
+                      minimumSize:
+                          const Size(double.infinity, 50), // Set button size
+                    ),
+                    child: const Text('Profilku',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold)),
                   ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => KendaraanPage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[100],
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15), // Increase padding
+                      minimumSize:
+                          const Size(double.infinity, 50), // Set button size
+                    ),
+                    child: const Text(
+                      'Kendaraan saya',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                _buildMakeAdminButton(),
               ],
             ),
-            const SizedBox(height: 20),
-            Text(
-              fullName.isNotEmpty ? fullName : email,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AccountFormPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[100],
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15), // Increase padding
-                  minimumSize:
-                      const Size(double.infinity, 50), // Set button size
-                ),
-                child: const Text('Profilku',
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold)),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => KendaraanPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[100],
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15), // Increase padding
-                  minimumSize:
-                      const Size(double.infinity, 50), // Set button size
-                ),
-                child: const Text(
-                  'Kendaraan saya',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            _buildMakeAdminButton(),
-          ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -328,7 +363,10 @@ class _AccountPageState extends State<AccountPage> {
         onPressed: () {
           _showLogoutConfirmationDialog(context);
         },
-        child: const Icon(Icons.logout_outlined,color: Colors.black,),
+        child: const Icon(
+          Icons.logout_outlined,
+          color: Colors.black,
+        ),
       ),
     );
   }

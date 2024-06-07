@@ -325,7 +325,7 @@ class _UploadPageState extends State<UploadPage> {
                   } else {
                     return DropdownButton<String>(
                       value: _selectedFolder,
-                      hint: const Text('Select Folder'),
+                      hint: const Text('Pilih Folder'),
                       onChanged: (String? newValue) {
                         setState(() {
                           _selectedFolder = newValue;

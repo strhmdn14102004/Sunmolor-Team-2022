@@ -275,7 +275,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Fungsi untuk membuat atau mendapatkan ID grup chat.
   void _createOrGetGroupId() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -470,9 +469,9 @@ class _HomePageState extends State<HomePage> {
               Container(
                 padding: EdgeInsets.all(Dimensions.size10),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.black),
                 child: Row(
                   children: [
                     Stack(
@@ -503,14 +502,22 @@ class _HomePageState extends State<HomePage> {
                                   ? nama_kendaraan
                                   : 'Perbarui Info kendaraan',
                               style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             ),
-                            Text(Nomor_polisi_kendaraan.isNotEmpty
-                                ? Nomor_polisi_kendaraan
-                                : 'Isi data kendaraan terlebih dahulu'),
-                            Text(Exp_pajak.isNotEmpty
-                                ? Exp_pajak
-                                : 'Isi data kendaraan terlebih dahulu')
+                            Text(
+                              Nomor_polisi_kendaraan.isNotEmpty
+                                  ? Nomor_polisi_kendaraan
+                                  : 'Isi data kendaraan terlebih dahulu',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            Text(
+                              Exp_pajak.isNotEmpty
+                                  ? Exp_pajak
+                                  : 'Isi data kendaraan terlebih dahulu',
+                              style: const TextStyle(color: Colors.white),
+                            )
                           ],
                         ),
                       ),

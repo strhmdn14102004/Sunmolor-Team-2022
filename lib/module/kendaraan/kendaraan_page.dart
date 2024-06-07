@@ -22,7 +22,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
   final TextEditingController _nickNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
-
+  String? _backgroundImageUrl;
   File? _image;
   String _gender = '';
   String _phoneNumberController = '';
@@ -33,7 +33,29 @@ class _KendaraanPageState extends State<KendaraanPage> {
   void initState() {
     super.initState();
     _loadProfileImage();
+    _loadBackgroundImage();
     _loadUserDataFromFirestore();
+  }
+
+  void _loadBackgroundImage() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String email = user.email!;
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(email)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            _backgroundImageUrl = userDoc['backgroundImageURL'];
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading background image: $e');
+    }
   }
 
   void _loadProfileImage() async {
@@ -108,114 +130,72 @@ class _KendaraanPageState extends State<KendaraanPage> {
     User? user = FirebaseAuth.instance.currentUser;
     String email = user != null ? user.email ?? "" : "";
     return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  _selectImage(context);
-                },
-                child: CircleAvatar(
-                  radius: 70,
-                  backgroundImage: _image != null
-                      ? FileImage(_image!) as ImageProvider<Object>?
-                      : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
-                ),
-              ),
-              SizedBox(height: Dimensions.size10),
-              Text("Klik image untuk mengupload photo kendaraan kamu"),
-              SizedBox(height: Dimensions.size30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Hallo",
-                    style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic),
-                  ),
-                  SizedBox(width: Dimensions.size10),
-                  Text(
-                    (_fullNameController.text ?? ""),
-                    style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: Dimensions.size20,
-              ),
-              TextFormField(
-                controller:
-_fullNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Kendaraan',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
+      body: Container(
+        decoration: BoxDecoration(
+          image: _backgroundImageUrl != null
+              ? DecorationImage(
+                  image: NetworkImage(_backgroundImageUrl!), fit: BoxFit.cover)
+              : null,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 100),
+                  child: GestureDetector(
+                    onTap: () {
+                      _selectImage(context);
+                    },
+                    child: CircleAvatar(
+                      radius: 70,
+                      backgroundImage: _image != null
+                          ? FileImage(_image!) as ImageProvider<Object>?
+                          : (_imageUrl != null
+                              ? NetworkImage(_imageUrl!)
+                              : null),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _nickNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nomor Polisi Kendaraan',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
+                SizedBox(height: Dimensions.size10),
+                Text("Klik image untuk mengupload photo kendaraan kamu"),
+                SizedBox(height: Dimensions.size30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Hallo",
+                      style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _phoneNumberController,
-                onChanged: (value) {
-                  setState(() {
-                    _phoneNumberController = value!;
-                  });
-                },
-                items: <String>[
-                  '',
-                  'Pertalite',
-                  'Pertamax 92',
-                  'Pertamax Turbo',
-                  'Other'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
+                    SizedBox(width: Dimensions.size10),
+                    Text(
+                      (_fullNameController.text ?? ""),
+                      style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
                     ),
-                  ),
-                  labelText: 'Jenis BBM',
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  _selectDate(context);
-                },
-                child: AbsorbPointer(
+                SizedBox(
+                  height: Dimensions.size20,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black54),
                   child: TextFormField(
-                    controller: _birthDateController,
+                    style: TextStyle(color: Colors.white),
+                    controller: _fullNameController,
                     decoration: const InputDecoration(
-                      labelText: 'Exp Pajak Kendaraan',
+                      labelText: 'Nama Kendaraan',
+                      labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
                           Radius.circular(20.0),
@@ -224,46 +204,137 @@ _fullNameController,
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _gender,
-                onChanged: (value) {
-                  setState(() {
-                    _gender = value!;
-                  });
-                },
-                items: <String>['', 'Honda', 'Yamaha', 'Piaggio', 'Suzuki']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black54),
+                  child: TextFormField(
+                    style: TextStyle(color: Colors.white),
+                    controller: _nickNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nomor Polisi Kendaraan',
+                      labelStyle: TextStyle(color: Colors.white),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                      ),
                     ),
                   ),
-                  labelText: 'Pabrikan Asal Kendaraan',
                 ),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  _uploadDataToFirestore(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  minimumSize: const Size(double.infinity, 50),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black54),
+                  child: DropdownButtonFormField<String>(
+                    style: TextStyle(color: Colors.white),
+                    value: _phoneNumberController,
+                    onChanged: (value) {
+                      setState(() {
+                        _phoneNumberController = value!;
+                      });
+                    },
+                    items: <String>[
+                      '',
+                      'Pertalite',
+                      'Pertamax 92',
+                      'Pertamax Turbo',
+                      'Other'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                      ),
+                      labelText: 'Jenis BBM',
+                      labelStyle: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ),
-                child: const Text(
-                  'Simpan',
-                  style: TextStyle(fontSize: 16),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () {
+                    _selectDate(context);
+                  },
+                  child: AbsorbPointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.black54),
+                      child: TextFormField(
+                        style: TextStyle(color: Colors.white),
+                        controller: _birthDateController,
+                        decoration: const InputDecoration(
+                          labelText: 'Exp Pajak Kendaraan',
+                          labelStyle: TextStyle(color: Colors.white),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black54),
+                  child: DropdownButtonFormField<String>(
+                    style: TextStyle(color: Colors.white),
+                    value: _gender,
+                    onChanged: (value) {
+                      setState(() {
+                        _gender = value!;
+                      });
+                    },
+                    items: <String>['', 'Honda', 'Yamaha', 'Piaggio', 'Suzuki']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                      ),
+                      labelStyle: TextStyle(color: Colors.white),
+                      labelText: 'Pabrikan Asal Kendaraan',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () {
+                    _uploadDataToFirestore(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: const Text(
+                    'Simpan',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -298,88 +369,87 @@ _fullNameController,
     }
   }
 
- void _uploadDataToFirestore(BuildContext context) async {
-  try {
-    String? email = FirebaseAuth.instance.currentUser?.email;
-    if (email == null) {
-      print('User email is null');
-      return;
-    }
+  void _uploadDataToFirestore(BuildContext context) async {
+    try {
+      String? email = FirebaseAuth.instance.currentUser?.email;
+      if (email == null) {
+        print('User email is null');
+        return;
+      }
 
-    String fullName = _fullNameController.text.trim();
-    String nickName = _nickNameController.text.trim();
-    String phoneNumber = _phoneNumberController;
-    String birthDate = _birthDateController.text.trim();
-    String gender = _gender;
+      String fullName = _fullNameController.text.trim();
+      String nickName = _nickNameController.text.trim();
+      String phoneNumber = _phoneNumberController;
+      String birthDate = _birthDateController.text.trim();
+      String gender = _gender;
 
-    if (fullName.isEmpty ||
-        nickName.isEmpty ||
-        phoneNumber.isEmpty ||
-        birthDate.isEmpty ||
-        gender.isEmpty) {
+      if (fullName.isEmpty ||
+          nickName.isEmpty ||
+          phoneNumber.isEmpty ||
+          birthDate.isEmpty ||
+          gender.isEmpty) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Please fill in all fields.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
       showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Please fill in all fields.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
-              ),
-            ],
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(
+              value: null,
+              strokeWidth: 6, // Thickness of the circular progress
+            ),
           );
         },
       );
-      return;
-    }
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Center(
-          child: CircularProgressIndicator(
-            value: null,
-            strokeWidth: 6, // Thickness of the circular progress
-          ),
-        );
-      },
-    );
+      await FirebaseFirestore.instance.collection('kendaraan').doc(email).set({
+        'Nama Kendaraan': fullName,
+        'Nomor Polisi Kendaraan': nickName,
+        'Exp Pajak Kendaraan': birthDate,
+        'Jenis BBM': phoneNumber,
+        'Pabrikan Asal': gender,
+        'kendaraanImageURL':
+            _image != null ? await _uploadImageToFirebaseStorage() : null,
+      });
 
-    await FirebaseFirestore.instance.collection('kendaraan').doc(email).set({
-      'Nama Kendaraan': fullName,
-      'Nomor Polisi Kendaraan': nickName,
-      'Exp Pajak Kendaraan': birthDate,
-      'Jenis BBM': phoneNumber,
-      'Pabrikan Asal': gender,
-      'kendaraanImageURL': _image != null ? await _uploadImageToFirebaseStorage() : null,
-    });
-
-     Navigator.of(context).pushReplacement(
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(
             builder: (context) => LoginScreen()), // Navigate back to login
       );
       Navigator.of(context).push(
         SuccessOverlay(
-          message:
-              "Akun Berhasil dibuat, Login untuk masuk",
+          message: "Akun Berhasil dibuat, Login untuk masuk",
         ),
       );
-  } catch (e) {
-    print('Error uploading data to Firestore: $e');
-    Navigator.of(context).pop(); // Close progress indicator
-    Navigator.of(context).push(
-      ErrorOverlay(
-        message: "Profile Gagal diupload",
-      ),
-    );
+    } catch (e) {
+      print('Error uploading data to Firestore: $e');
+      Navigator.of(context).pop(); // Close progress indicator
+      Navigator.of(context).push(
+        ErrorOverlay(
+          message: "Profile Gagal diupload",
+        ),
+      );
+    }
   }
-}
-
 
   Future<String> _uploadImageToFirebaseStorage() async {
     try {
