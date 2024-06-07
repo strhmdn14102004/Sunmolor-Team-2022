@@ -324,30 +324,6 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          centerTitle: true,
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Expanded(
-                child: Text(
-                  "Sunmolor Team 2022",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                      onPressed: _pickImage,
-                      icon: Icon(Icons.wallpaper_outlined))
-                ],
-              ),
-            ],
-          ),
-        ),
         body: Container(
           decoration: BoxDecoration(
             image: _backgroundImageUrl != null
@@ -455,6 +431,19 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    "",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.wallpaper_rounded))
+                ],
+              ),
               Stack(
                 children: [
                   CircleAvatar(
@@ -504,7 +493,7 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: Dimensions.size20),
                     Expanded(
                       child: SingleChildScrollView(
-                        physics: AlwaysScrollableScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -538,7 +527,7 @@ class _HomePageState extends State<HomePage> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
+                      return const Center(
                         child: CircularProgressIndicator(),
                       );
                     }
@@ -548,7 +537,7 @@ class _HomePageState extends State<HomePage> {
                       );
                     }
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(
+                      return const Center(
                         child: Text('Tidak ada data pengguna.'),
                       );
                     }
