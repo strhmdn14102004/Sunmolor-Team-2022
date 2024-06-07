@@ -178,6 +178,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                     _selectImage(context);
                   },
                   child: CircleAvatar(
+                    backgroundColor: Colors.blue[100],
                     radius: 70,
                     backgroundImage: _image != null
                         ? FileImage(_image!) as ImageProvider<Object>?
