@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
+import 'package:sunmolor_team/module/account/account_form/account_form_page.dart';
 import 'package:sunmolor_team/module/account/account_page.dart';
 import 'package:sunmolor_team/module/chat/chat_page.dart';
 import 'package:sunmolor_team/module/home/home_bloc.dart';
@@ -393,19 +394,27 @@ class _HomePageState extends State<HomePage> {
                       icon: const Icon(Icons.wallpaper_rounded))
                 ],
               ),
-              Stack(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.blue[100],
-                    radius: 70,
-                    backgroundImage:
-                        _imageUrl != null ? NetworkImage(_imageUrl!) : null,
-                  ),
-                  if (_imageUrl == null)
-                    const Positioned.fill(
-                      child: CircularProgressIndicator(),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AccountFormPage()),
+                  );
+                },
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.blue[100],
+                      radius: 70,
+                      backgroundImage:
+                          _imageUrl != null ? NetworkImage(_imageUrl!) : null,
                     ),
-                ],
+                    if (_imageUrl == null)
+                      const Positioned.fill(
+                        child: CircularProgressIndicator(),
+                      ),
+                  ],
+                ),
               ),
               SizedBox(height: Dimensions.size20),
               Text(
