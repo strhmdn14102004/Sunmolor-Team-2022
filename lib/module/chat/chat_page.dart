@@ -155,6 +155,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                         borderRadius: BorderRadius.circular(20),
                         color: Colors.black45),
                     child: TextField(
+                      style: const TextStyle(color: Colors.white),
                       controller: _messageController,
                       decoration: InputDecoration(
                         fillColor: Colors.black26,

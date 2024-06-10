@@ -75,7 +75,7 @@ class _AccountPageState extends State<AccountPage> {
             minimumSize: const Size(double.infinity, 50), // Set button size
           ),
           child: const Text(
-            'Ubah Status Member',
+            'Change Member Status',
             style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
           ),
@@ -331,7 +331,7 @@ class _AccountPageState extends State<AccountPage> {
                       minimumSize:
                           const Size(double.infinity, 50), // Set button size
                     ),
-                    child: const Text('Profilku',
+                    child: const Text('My Profile',
                         style: TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -359,7 +359,7 @@ class _AccountPageState extends State<AccountPage> {
                           const Size(double.infinity, 50), // Set button size
                     ),
                     child: const Text(
-                      'Kendaraan saya',
+                      'My Vehicle',
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

@@ -21,13 +21,11 @@ class UploadPage extends StatefulWidget {
 class _UploadPageState extends State<UploadPage> {
   final TextEditingController _folderController = TextEditingController();
   String? _selectedFolder;
-  File? _image;
   List<File> _images = [];
   final picker = ImagePicker();
   double _uploadProgress = 0.0;
   bool _isDownloading = false;
   double _downloadProgress = 0.0;
-  Map<String, dynamic>? _selectedPhoto;
   bool _isAdmin = false;
   List<Map<String, dynamic>> _allPhotos = [];
   List<Map<String, dynamic>> _selectedPhotos = [];

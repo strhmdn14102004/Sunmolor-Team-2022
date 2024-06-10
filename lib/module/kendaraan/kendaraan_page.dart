@@ -20,7 +20,6 @@ class KendaraanPage extends StatefulWidget {
 class _KendaraanPageState extends State<KendaraanPage> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _nickNameController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
   String? _backgroundImageUrl;
   File? _image;

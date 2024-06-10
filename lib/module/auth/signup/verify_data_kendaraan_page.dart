@@ -21,7 +21,6 @@ class VerifyDataKendaraanPage extends StatefulWidget {
 class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _nickNameController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
 
   File? _image;
