@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.dart';
@@ -124,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: _isObscure,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(
+                    border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(20.0),
                       ),

@@ -68,13 +68,12 @@ class _AccountPageState extends State<AccountPage> {
           onPressed: () {
             _showMakeAdminDialog(context);
           },
-         style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15), // Increase padding
-                      minimumSize:
-                          const Size(double.infinity, 50), // Set button size
-                    ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue[100],
+            padding:
+                const EdgeInsets.symmetric(vertical: 15), // Increase padding
+            minimumSize: const Size(double.infinity, 50), // Set button size
+          ),
           child: const Text(
             'Ubah Status Member',
             style: TextStyle(
@@ -83,7 +82,7 @@ class _AccountPageState extends State<AccountPage> {
         ),
       );
     } else {
-      return SizedBox(); // Jika bukan founder, kembalikan widget kosong
+      return const SizedBox(); // Jika bukan founder, kembalikan widget kosong
     }
   }
 
@@ -291,7 +290,7 @@ class _AccountPageState extends State<AccountPage> {
                           _imageUrl != null ? NetworkImage(_imageUrl!) : null,
                     ),
                     if (_imageUrl == null)
-                      Positioned.fill(
+                      const Positioned.fill(
                         child: CircularProgressIndicator(),
                       ),
                   ],
@@ -299,7 +298,8 @@ class _AccountPageState extends State<AccountPage> {
                 const SizedBox(height: 20),
                 Text(
                   fullName.isNotEmpty ? fullName : email,
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 25, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 Container(
@@ -326,7 +326,7 @@ class _AccountPageState extends State<AccountPage> {
                             fontWeight: FontWeight.bold)),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Container(
@@ -355,7 +355,7 @@ class _AccountPageState extends State<AccountPage> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 _buildMakeAdminButton(),

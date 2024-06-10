@@ -20,7 +20,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
-  bool _isObscure = true; // State to determine if password is obscured or not
+  bool _isObscure = true;
 
   Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
     try {
@@ -78,12 +78,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 SizedBox(height: Dimensions.size10),
-                Text(
+                const Text(
                   "Daftar Akun\nSunmolor Team",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -101,7 +101,7 @@ class _SignUpState extends State<SignUp> {
                   obscureText: _isObscure, // Use the obscureText property
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(
+                    border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(20.0), // Adjust the radius as needed
                       ),
@@ -118,22 +118,21 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => _signUpWithEmailAndPassword(context),
-                  child: Text('Daftar'),
+                  child: const Text('Daftar'),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              LoginScreen()), 
+                          builder: (context) => const LoginScreen()),
                     );
                   },
-                  child: Text(
+                  child: const Text(
                     'Sudah punya akun? Login',
                   ),
                 ),

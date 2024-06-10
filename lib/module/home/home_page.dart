@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
     _loadUserPoints();
     _loadProfileImage();
     _loadBackgroundImage();
-    _createOrGetGroupId(); // Tambahkan ini untuk membuat atau mendapatkan ID grup chat.
+    _createOrGetGroupId();
   }
 
   void _loadBackgroundImage() async {
@@ -141,7 +141,6 @@ class _HomePageState extends State<HomePage> {
     return '';
   }
 
-  // Function to pick image from gallery
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);

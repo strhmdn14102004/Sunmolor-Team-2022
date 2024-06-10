@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -153,9 +154,9 @@ class _AccountFormPageState extends State<AccountFormPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 50),
-                  child: const Text(
+                const Padding(
+                  padding: EdgeInsets.only(top: 50),
+                  child: Text(
                     "Hallo",
                     style: TextStyle(
                         fontSize: 28,
@@ -186,14 +187,14 @@ class _AccountFormPageState extends State<AccountFormPage> {
                   ),
                 ),
                 SizedBox(height: Dimensions.size10),
-                Text("Klik image untuk mengupload photo profile"),
+                const Text("Klik image untuk mengupload photo profile"),
                 SizedBox(height: Dimensions.size30),
                 Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     controller: _fullNameController,
                     decoration: const InputDecoration(
                       counterStyle: TextStyle(color: Colors.white),
@@ -213,7 +214,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     controller: _nickNameController,
                     decoration: const InputDecoration(
                       labelText: 'Nama Panggilan',
@@ -232,7 +233,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     controller: _addressController,
                     decoration: const InputDecoration(
                       labelStyle: TextStyle(color: Colors.white),
@@ -251,7 +252,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     keyboardType: TextInputType.number,
                     controller: _phoneNumberController,
                     decoration: const InputDecoration(
@@ -276,7 +277,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.black54),
                       child: TextFormField(
-                        style: TextStyle(color: Colors.white),
+                        style: const TextStyle(color: Colors.white),
                         controller: _birthDateController,
                         decoration: const InputDecoration(
                           labelText: 'Tanggal Lahir',
@@ -298,7 +299,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: DropdownButtonFormField<String>(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     value: _gender,
                     onChanged: (value) {
                       setState(() {

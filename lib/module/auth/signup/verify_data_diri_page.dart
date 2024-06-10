@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
-import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/module/auth/signup/verify_data_kendaraan_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
@@ -156,7 +156,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                 ),
               ),
               SizedBox(height: Dimensions.size10),
-              Text("Klik image untuk mengupload photo profile"),
+              const Text("Klik image untuk mengupload photo profile"),
               SizedBox(height: Dimensions.size30),
               TextFormField(
                 controller: _fullNameController,
@@ -352,7 +352,8 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
       // Show success overlay
       Navigator.of(context).push(
         SuccessOverlay(
-          message: "Data diri berhasil disimpan\nLanjutkan Isi Informasi Kendaraan kamu",
+          message:
+              "Data diri berhasil disimpan\nLanjutkan Isi Informasi Kendaraan kamu",
         ),
       );
     } catch (e) {

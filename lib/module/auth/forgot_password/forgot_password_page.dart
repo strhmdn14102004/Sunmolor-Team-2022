@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
@@ -26,18 +26,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       });
       Navigator.of(context).push(
         SuccessOverlay(
-          message:
-              "Link Reset Password Berhasil Dikirimkan Ke Email Kamu.",
+          message: "Link Reset Password Berhasil Dikirimkan Ke Email Kamu.",
         ),
       );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-            builder: (context) => LoginScreen()), // Navigate back to login
+            builder: (context) =>
+                const LoginScreen()), // Navigate back to login
       );
-        Navigator.of(context).push(
+      Navigator.of(context).push(
         SuccessOverlay(
-          message:
-              "Link Reset Password Berhasil Dikirimkan Ke Email Kamu.",
+          message: "Link Reset Password Berhasil Dikirimkan Ke Email Kamu.",
         ),
       );
     } catch (e) {
@@ -77,13 +76,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
           SizedBox(height: Dimensions.size10),
-          Text(
+          const Text(
             "Reset Password",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Padding(
-           padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             child: TextFormField(
               controller: _emailController,
               decoration: const InputDecoration(

@@ -1,12 +1,13 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as Path;
+import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
@@ -32,7 +33,7 @@ class _UploadPageState extends State<UploadPage> {
   @override
   void initState() {
     super.initState();
-    _checkAdminStatus(); // Panggil fungsi untuk memeriksa status admin saat aplikasi dimuat
+    _checkAdminStatus();
   }
 
   Future<void> _checkAdminStatus() async {
@@ -250,30 +251,30 @@ class _UploadPageState extends State<UploadPage> {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem<int>(
+              const PopupMenuItem<int>(
                 value: 0,
                 child: Row(
-                  children: const [
+                  children: [
                     Icon(Icons.select_all_outlined, color: Colors.black),
                     SizedBox(width: 8),
                     Text('Pilih Semua'),
                   ],
                 ),
               ),
-              PopupMenuItem<int>(
+              const PopupMenuItem<int>(
                 value: 1,
                 child: Row(
-                  children: const [
+                  children: [
                     Icon(Icons.cancel_outlined, color: Colors.black),
                     SizedBox(width: 8),
                     Text('Batalkan Pilihan'),
                   ],
                 ),
               ),
-              PopupMenuItem<int>(
+              const PopupMenuItem<int>(
                 value: 2,
                 child: Row(
-                  children: const [
+                  children: [
                     Icon(Icons.download, color: Colors.black),
                     SizedBox(width: 8),
                     Text('Download Semua yang dipilih'),
@@ -589,7 +590,7 @@ class _SuccesseOverlayState extends State<SuccesseOverlay> {
           children: <Widget>[
             Lottie.asset(
               "assets/lottie/success.json",
-              frameRate: FrameRate(60),
+              frameRate: const FrameRate(60),
               width: Dimensions.size100 * 2,
               repeat: true,
             ),

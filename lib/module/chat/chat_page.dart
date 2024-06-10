@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 
 class GroupChatPage extends StatefulWidget {
@@ -20,17 +20,12 @@ class _GroupChatPageState extends State<GroupChatPage> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String email = user.email!;
-
-        // Get user document based on email
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(email)
             .get();
-
         if (userDoc.exists) {
           String fullName = userDoc['fullName'];
-
-          // Create a new message document in the group chat collection
           await FirebaseFirestore.instance
               .collection('groupChats')
               .doc(widget.groupId)
@@ -104,8 +99,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
             children: [
               CircleAvatar(
                 backgroundColor: Colors.transparent,
-                backgroundImage: AssetImage(
-                    'assets/images/Sunmolor.png'), // Replace with your asset image path
+                backgroundImage: AssetImage('assets/images/Sunmolor.png'),
               ),
               SizedBox(width: 10),
               Text('Sunmolor Team Chat'),
@@ -134,16 +128,16 @@ class _GroupChatPageState extends State<GroupChatPage> {
                     },
                   );
                 } else {
-                  return  Center(
+                  return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(),
+                        const CircularProgressIndicator(),
                         SizedBox(
                           height: Dimensions.size10,
                         ),
-                        Text("Tunggu sebentar pesan sedang dimuat")
+                        const Text("Tunggu sebentar pesan sedang dimuat")
                       ],
                     ),
                   );
