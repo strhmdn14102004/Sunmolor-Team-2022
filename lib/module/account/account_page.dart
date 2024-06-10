@@ -71,8 +71,8 @@ class _AccountPageState extends State<AccountPage> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[100],
             padding:
-                const EdgeInsets.symmetric(vertical: 15), // Increase padding
-            minimumSize: const Size(double.infinity, 50), // Set button size
+                const EdgeInsets.symmetric(vertical: 15),
+            minimumSize: const Size(double.infinity, 50),
           ),
           child: const Text(
             'Change Member Status',
@@ -82,7 +82,7 @@ class _AccountPageState extends State<AccountPage> {
         ),
       );
     } else {
-      return const SizedBox(); // Jika bukan founder, kembalikan widget kosong
+      return const SizedBox();
     }
   }
 
