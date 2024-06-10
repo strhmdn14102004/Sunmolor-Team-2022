@@ -10,6 +10,7 @@ import 'package:path/path.dart' as Path;
 import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
+import 'package:sunmolor_team/overlay/error_overlay.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
 
 class UploadPage extends StatefulWidget {
@@ -49,9 +50,7 @@ class _UploadPageState extends State<UploadPage> {
         if (userDoc.exists) {
           String status = userDoc['status'];
           setState(() {
-            _isAdmin = status == 'admin' ||
-                status ==
-                    'founder'; // Menetapkan _isAdmin menjadi true jika status adalah 'admin' atau 'founder'
+            _isAdmin = status == 'admin' || status == 'founder';
           });
         }
       }
@@ -62,7 +61,6 @@ class _UploadPageState extends State<UploadPage> {
 
   Future<void> _pickImages() async {
     final pickedFiles = await picker.pickMultiImage();
-
     setState(() {
       if (pickedFiles != null && pickedFiles.isNotEmpty) {
         _images =
@@ -78,14 +76,12 @@ class _UploadPageState extends State<UploadPage> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
       String uploaderEmail = user.email!;
-
       for (var image in _images) {
         String fileName = Path.basename(image.path);
         Reference storageReference = FirebaseStorage.instance
             .ref()
             .child('uploads/$_selectedFolder/$fileName');
         UploadTask uploadTask = storageReference.putFile(image);
-
         uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
           setState(() {
             _uploadProgress = snapshot.bytesTransferred.toDouble() /
@@ -95,7 +91,6 @@ class _UploadPageState extends State<UploadPage> {
 
         await uploadTask.whenComplete(() => null);
         String downloadURL = await storageReference.getDownloadURL();
-
         await FirebaseFirestore.instance
             .collection('uploads')
             .doc(_selectedFolder)
@@ -107,7 +102,6 @@ class _UploadPageState extends State<UploadPage> {
           'diupload_oleh': uploaderEmail,
         });
       }
-
       setState(() {
         _images = [];
         _uploadProgress = 0.0;
@@ -119,11 +113,11 @@ class _UploadPageState extends State<UploadPage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Tidak ada photo untuk diupload,\nPilih foto terlebih dahulu.')),
-      );
+      Navigator.of(context).push(
+      ErrorOverlay(
+        message: "Tidak ada photo untuk diupload\nPilih foto terlebih dahulu",
+      ),
+    );
     }
   }
 
@@ -135,7 +129,6 @@ class _UploadPageState extends State<UploadPage> {
     setState(() {
       _selectedFolder = folderName;
     });
-
     Navigator.of(context).push(
       SuccessOverlay(
         message: "Folder Berhasil Dibuat",
@@ -165,7 +158,6 @@ class _UploadPageState extends State<UploadPage> {
       _isDownloading = true;
       _downloadProgress = 0.0;
     });
-
     final Reference ref = FirebaseStorage.instance.refFromURL(url);
     final Directory? tempDir = await getExternalStorageDirectory();
     final Directory downloadDir =
@@ -175,14 +167,12 @@ class _UploadPageState extends State<UploadPage> {
     }
     final File file = File('${downloadDir.path}/${ref.name}');
     final downloadTask = ref.writeToFile(file);
-
     downloadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
       setState(() {
         _downloadProgress = snapshot.bytesTransferred.toDouble() /
             snapshot.totalBytes.toDouble();
       });
     });
-
     await downloadTask.whenComplete(() {
       setState(() {
         _isDownloading = false;
@@ -190,31 +180,28 @@ class _UploadPageState extends State<UploadPage> {
       });
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('File downloaded to ${file.path}')),
+    Navigator.of(context).push(
+      SuccessOverlay(
+        message: "Photo Berhasil Disimpan di ${file.path}",
+      ),
     );
   }
 
   Future<void> _deletePhoto(
       BuildContext context, Map<String, dynamic> photo) async {
     if (_selectedFolder != null && photo != null) {
-      // Hapus foto dari Firebase Storage
       final Reference ref = FirebaseStorage.instance.refFromURL(photo['url']);
       await ref.delete();
-
-      // Hapus catatan foto dari Firestore
       await FirebaseFirestore.instance
           .collection('uploads')
           .doc(_selectedFolder)
           .collection('images')
           .doc(photo['id'])
           .delete();
-
       setState(() {
         _allPhotos.remove(photo);
         _selectedPhotos.remove(photo);
       });
-
       Navigator.pop(context);
       Navigator.of(context).push(
         SuccessOverlay(
@@ -305,7 +292,7 @@ class _UploadPageState extends State<UploadPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (_isAdmin) // Hanya tampilkan widget Container jika pengguna memiliki status admin atau founder
+              if (_isAdmin)
                 Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
@@ -376,7 +363,8 @@ class _UploadPageState extends State<UploadPage> {
                               right: 0,
                               top: 0,
                               child: IconButton(
-                                icon: Icon(Icons.cancel, color: Colors.red),
+                                icon:
+                                    const Icon(Icons.cancel, color: Colors.red),
                                 onPressed: () {
                                   setState(() {
                                     _images.remove(image);
