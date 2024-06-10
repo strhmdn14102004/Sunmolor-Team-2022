@@ -18,12 +18,9 @@ class AccountFormPage extends StatefulWidget {
 
 class _AccountFormPageState extends State<AccountFormPage> {
   final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _nickNameController =
-      TextEditingController(); // Added nickname field
-  final TextEditingController _addressController =
-      TextEditingController(); // Added address field
-  final TextEditingController _phoneNumberController =
-      TextEditingController(); // Added phone number field
+  final TextEditingController _nickNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
   File? _image;
   String _gender = '';
@@ -202,7 +199,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
-                          Radius.circular(20.0), // Adjust the radius as needed
+                          Radius.circular(20.0),
                         ),
                       ),
                     ),
@@ -221,7 +218,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
-                          Radius.circular(20.0), // Adjust the radius as needed
+                          Radius.circular(20.0),
                         ),
                       ),
                     ),
@@ -240,7 +237,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       labelText: 'Alamat Lengkap',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
-                          Radius.circular(20.0), // Adjust the radius as needed
+                          Radius.circular(20.0),
                         ),
                       ),
                     ),
@@ -260,7 +257,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                       labelStyle: TextStyle(color: Colors.white),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
-                          Radius.circular(20.0), // Adjust the radius as needed
+                          Radius.circular(20.0),
                         ),
                       ),
                     ),
@@ -284,8 +281,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                           labelStyle: TextStyle(color: Colors.white),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(
-                              Radius.circular(
-                                  20.0), // Adjust the radius as needed
+                              Radius.circular(20.0),
                             ),
                           ),
                         ),
@@ -316,7 +312,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
-                          Radius.circular(20.0), // Adjust the radius as needed
+                          Radius.circular(20.0),
                         ),
                       ),
                       labelStyle: TextStyle(color: Colors.white),
@@ -330,10 +326,8 @@ class _AccountFormPageState extends State<AccountFormPage> {
                     _uploadDataToFirestore(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15), // Increase padding
-                    minimumSize:
-                        const Size(double.infinity, 50), // Set button size
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    minimumSize: const Size(double.infinity, 50),
                   ),
                   child: const Text(
                     'Simpan',
@@ -354,11 +348,10 @@ class _AccountFormPageState extends State<AccountFormPage> {
   void _selectImage(BuildContext context) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        _imageUrl = null; // Reset imageUrl to null since a new image is chosen
+        _imageUrl = null;
       }
     });
   }
@@ -370,7 +363,6 @@ class _AccountFormPageState extends State<AccountFormPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-
     if (pickedDate != null) {
       setState(() {
         _birthDateController.text =
@@ -381,29 +373,21 @@ class _AccountFormPageState extends State<AccountFormPage> {
 
   void _uploadDataToFirestore(BuildContext context) async {
     try {
-      String? email = FirebaseAuth
-          .instance.currentUser?.email; // Ambil email pengguna saat ini
+      String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
-        // Handle jika email pengguna tidak tersedia
         print('User email is null');
         return;
       }
-
       String fullName = _fullNameController.text.trim();
-      String nickName =
-          _nickNameController.text.trim(); // Get nickname field value
-      String address =
-          _addressController.text.trim(); // Get address field value
-      String phoneNumber =
-          _phoneNumberController.text.trim(); // Get phone number field value
+      String nickName = _nickNameController.text.trim();
+      String address = _addressController.text.trim();
+      String phoneNumber = _phoneNumberController.text.trim();
       String birthDate = _birthDateController.text.trim();
       String gender = _gender;
-
-      // Validasi bahwa kedua kolom diisi
       if (fullName.isEmpty ||
-          nickName.isEmpty || // Validate nickname field
-          address.isEmpty || // Validate address field
-          phoneNumber.isEmpty || // Validate phone number field
+          nickName.isEmpty ||
+          address.isEmpty ||
+          phoneNumber.isEmpty ||
           birthDate.isEmpty ||
           gender.isEmpty) {
         showDialog(
@@ -425,21 +409,16 @@ class _AccountFormPageState extends State<AccountFormPage> {
         );
         return;
       }
-
-      // Menambahkan data ke Firestore berdasarkan email pengguna
       await FirebaseFirestore.instance.collection('users').doc(email).set({
         'fullName': fullName,
-        'nickName': nickName, // Add nickname field
-        'address': address, // Add address field
-        'phoneNumber': phoneNumber, // Add phone number field
+        'nickName': nickName,
+        'address': address,
+        'phoneNumber': phoneNumber,
         'birthDate': birthDate,
         'gender': gender,
-        // tambahkan foto profil jika ada
         'profileImageURL':
             _image != null ? await _uploadImageToFirebaseStorage() : null,
       });
-
-      // Tampilkan dialog sukses
       Navigator.of(context).push(
         SuccessOverlay(
           message: "Profile Berhasil diupload",
@@ -447,7 +426,6 @@ class _AccountFormPageState extends State<AccountFormPage> {
       );
     } catch (e) {
       print('Error uploading data to Firestore: $e');
-      // Tampilkan pesan error jika terjadi kesalahan
       Navigator.of(context).push(
         ErrorOverlay(
           message: "Profile Gagal diupload",
@@ -467,7 +445,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
       return imageUrl;
     } catch (e) {
       print('Error uploading image to Firebase Storage: $e');
-      throw e; // Re-throw error to handle it in the caller function
+      throw e;
     }
   }
 }

@@ -120,8 +120,15 @@ class _SignUpState extends State<SignUp> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 1, 48, 86),
+                  ),
                   onPressed: () => _signUpWithEmailAndPassword(context),
-                  child: const Text('Daftar'),
+                  child: const Text(
+                    'Daftar',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 TextButton(
@@ -134,6 +141,7 @@ class _SignUpState extends State<SignUp> {
                   },
                   child: const Text(
                     'Sudah punya akun? Login',
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
               ],

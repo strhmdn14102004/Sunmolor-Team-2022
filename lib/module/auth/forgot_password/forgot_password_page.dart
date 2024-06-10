@@ -59,7 +59,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop(); // Navigate back
+            Navigator.of(context).pop();
           },
         ),
       ),
@@ -69,7 +69,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         children: [
           ClipOval(
             child: Image.asset(
-              'assets/images/Sunmolor.png', // Add your sunmolor_teamee logo image asset
+              'assets/images/Sunmolor.png',
               width: 150,
               height: 150,
               fit: BoxFit.cover,
@@ -89,7 +89,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 labelText: 'Email',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(
-                    Radius.circular(20.0), // Adjust the radius as needed
+                    Radius.circular(20.0),
                   ),
                 ),
               ),
@@ -97,8 +97,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 1, 48, 86),
+            ),
             onPressed: () => _sendPasswordResetEmail(context),
-            child: const Text('Reset Password'),
+            child: const Text(
+              'Reset Password',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

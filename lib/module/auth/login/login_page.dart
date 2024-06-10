@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: const Text(
                       'Lupa Password?',
-                      style: TextStyle(),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                 ),
@@ -158,12 +158,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton(
                   onPressed: () => _signInWithEmailAndPassword(context),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 1, 48, 86),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     minimumSize: const Size(double.infinity, 50),
                   ),
                   child: const Text(
                     'Login',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -177,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   child: const Text(
                     'Belum memiliki akun? Daftar Sekarang',
-                    style: TextStyle(),
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
               ],

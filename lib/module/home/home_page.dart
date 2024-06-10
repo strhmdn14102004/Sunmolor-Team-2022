@@ -508,7 +508,7 @@ class _HomePageState extends State<HomePage> {
                                     style: const TextStyle(color: Colors.white),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 66),
+                                    padding: const EdgeInsets.only(left: 65),
                                     child: Text(
                                       jenis_bbm.isNotEmpty
                                           ? jenis_bbm
