@@ -126,9 +126,10 @@ class _AccountPageState extends State<AccountPage> {
         return StatefulBuilder(
           builder: (BuildContext context, setState) {
             return AlertDialog(
+              backgroundColor: Colors.black54,
               title: const Text(
                 "Pilih\nAkun dan Status",
-                style: TextStyle(),
+                style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               alignment: Alignment.center,
@@ -137,7 +138,10 @@ class _AccountPageState extends State<AccountPage> {
                 children: [
                   DropdownButton<String>(
                     value: _selectedAccount,
-                    hint: const Text('Pilih Akun'),
+                    hint: const Text(
+                      'Pilih Akun',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedAccount = newValue;
@@ -147,7 +151,10 @@ class _AccountPageState extends State<AccountPage> {
                         .map<DropdownMenuItem<String>>((String email) {
                       return DropdownMenuItem<String>(
                         value: email,
-                        child: Text(email),
+                        child: Text(
+                          email,
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       );
                     }).toList(),
                   ),
@@ -163,7 +170,7 @@ class _AccountPageState extends State<AccountPage> {
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value),
+                        child: Text(value,style: TextStyle(color: Colors.grey),),
                       );
                     }).toList(),
                   ),
@@ -394,7 +401,7 @@ class _AccountPageState extends State<AccountPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.black87,
+          backgroundColor: Colors.black54,
           title: const Text(
             "Konfirmasi Logout",
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
