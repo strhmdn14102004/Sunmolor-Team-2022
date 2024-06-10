@@ -360,7 +360,10 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(builder: (context) => AccountPage()),
                     );
                   },
-                  child: const Icon(Icons.person),
+                  child: const Icon(
+                    Icons.person,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
@@ -379,7 +382,8 @@ class _HomePageState extends State<HomePage> {
                               GroupChatPage(groupId: _groupId.toString())),
                     );
                   },
-                  child: const Icon(Icons.chat_bubble_outline),
+                  child: const Icon(Icons.chat_bubble_outline,
+                      color: Colors.black),
                 ),
               ),
             ),
@@ -396,7 +400,7 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(builder: (context) => UploadPage()),
                     );
                   },
-                  child: const Icon(Icons.upload),
+                  child: const Icon(Icons.upload, color: Colors.black),
                 ),
               ),
             ),

@@ -68,10 +68,13 @@ class _AccountPageState extends State<AccountPage> {
           onPressed: () {
             _showMakeAdminDialog(context);
           },
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            minimumSize: const Size(double.infinity, 50),
-          ),
+         style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[100],
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15), // Increase padding
+                      minimumSize:
+                          const Size(double.infinity, 50), // Set button size
+                    ),
           child: const Text(
             'Ubah Status Member',
             style: TextStyle(

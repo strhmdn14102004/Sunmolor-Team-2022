@@ -161,7 +161,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                   ),
                 ),
                 SizedBox(height: Dimensions.size10),
-                Text("Klik image untuk mengupload photo kendaraan kamu"),
+                const Text("Klik image untuk mengupload photo kendaraan kamu"),
                 SizedBox(height: Dimensions.size30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -192,7 +192,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     controller: _fullNameController,
                     decoration: const InputDecoration(
                       labelText: 'Nama Kendaraan',
@@ -211,7 +211,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     controller: _nickNameController,
                     decoration: const InputDecoration(
                       labelText: 'Nomor Polisi Kendaraan',
@@ -230,7 +230,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: DropdownButtonFormField<String>(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     value: _phoneNumberController,
                     onChanged: (value) {
                       setState(() {
@@ -271,7 +271,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.black54),
                       child: TextFormField(
-                        style: TextStyle(color: Colors.white),
+                        style: const TextStyle(color: Colors.white),
                         controller: _birthDateController,
                         decoration: const InputDecoration(
                           labelText: 'Exp Pajak Kendaraan',
@@ -292,7 +292,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black54),
                   child: DropdownButtonFormField<String>(
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     value: _gender,
                     onChanged: (value) {
                       setState(() {
@@ -413,7 +413,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(
               value: null,
               strokeWidth: 6, // Thickness of the circular progress
@@ -434,7 +434,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-            builder: (context) => LoginScreen()), // Navigate back to login
+            builder: (context) => const LoginScreen()), // Navigate back to login
       );
       Navigator.of(context).push(
         SuccessOverlay(
