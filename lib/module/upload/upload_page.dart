@@ -278,7 +278,7 @@ class _UploadPageState extends State<UploadPage> {
                     Icon(Icons.download_for_offline_rounded,
                         color: Colors.green),
                     SizedBox(width: 8),
-                    Text('Download Semua yang dipilih'),
+                    Text('Download semua yang dipilih'),
                   ],
                 ),
               ),

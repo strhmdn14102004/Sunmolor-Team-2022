@@ -12,6 +12,7 @@ import 'package:sunmolor_team/module/account/account_page.dart';
 import 'package:sunmolor_team/module/chat/chat_page.dart';
 import 'package:sunmolor_team/module/home/home_bloc.dart';
 import 'package:sunmolor_team/module/home/home_state.dart';
+import 'package:sunmolor_team/module/kendaraan/kendaraan_page.dart';
 import 'package:sunmolor_team/module/upload/upload_page.dart';
 
 import '../../../helper/app_colors.dart';
@@ -440,64 +441,77 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     SizedBox(width: Dimensions.size20),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              nama_kendaraan.isNotEmpty
-                                  ? nama_kendaraan
-                                  : 'Perbarui Info kendaraan',
-                              style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                              textAlign: TextAlign.center,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  Nomor_polisi_kendaraan.isNotEmpty
-                                      ? Nomor_polisi_kendaraan
-                                      : 'Isi data kendaraan terlebih dahulu',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 100),
-                                  child: Text(
-                                    pabrikan_asal.isNotEmpty
-                                        ? pabrikan_asal
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => KendaraanPage()),
+                        );
+                      },
+                      child: Expanded(
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                nama_kendaraan.isNotEmpty
+                                    ? nama_kendaraan
+                                    : 'Perbarui Info kendaraan',
+                                style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    Nomor_polisi_kendaraan.isNotEmpty
+                                        ? Nomor_polisi_kendaraan
                                         : 'Isi data kendaraan terlebih dahulu',
                                     style: const TextStyle(color: Colors.white),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  Exp_pajak.isNotEmpty
-                                      ? Exp_pajak
-                                      : 'Isi data kendaraan terlebih dahulu',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 66),
-                                  child: Text(
-                                    jenis_bbm.isNotEmpty
-                                        ? jenis_bbm
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50),
+                                    child: Text(
+                                      pabrikan_asal.isNotEmpty
+                                          ? pabrikan_asal
+                                          : 'Isi data kendaraan terlebih dahulu',
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    Exp_pajak.isNotEmpty
+                                        ? Exp_pajak
                                         : 'Isi data kendaraan terlebih dahulu',
                                     style: const TextStyle(color: Colors.white),
                                   ),
-                                ),
-                              ],
-                            )
-                          ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 66),
+                                    child: Text(
+                                      jenis_bbm.isNotEmpty
+                                          ? jenis_bbm
+                                          : 'Isi data kendaraan terlebih dahulu',
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

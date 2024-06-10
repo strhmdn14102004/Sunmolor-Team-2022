@@ -158,7 +158,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                       controller: _messageController,
                       decoration: InputDecoration(
                         fillColor: Colors.black26,
-                        hintText: '  Kirim sebuah pesan...',
+                        hintText: '  Kirim sebuah pesan ...',
                         hintStyle: const TextStyle(color: Colors.white),
                         filled: true,
                         contentPadding: const EdgeInsets.all(10),
