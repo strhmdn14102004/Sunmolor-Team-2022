@@ -52,10 +52,9 @@ class _HomePageState extends State<HomePage> {
     _loadKendaraanImage();
     _loadUserDataFromFirestore();
     _loadkendaraanDataFromFirestore();
-    _loadUserPoints();
+
     _loadProfileImage();
     _loadBackgroundImage();
-    _createOrGetGroupId();
   }
 
   void _loadBackgroundImage() async {
@@ -251,59 +250,6 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         loading = false;
       });
-    }
-  }
-
-  void _loadUserPoints() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String email = user.email!;
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(email)
-            .get();
-        if (userDoc.exists) {
-          setState(() {
-            points = userDoc['points'] ?? 0;
-          });
-        }
-      }
-    } catch (e) {
-      print('Error loading user points from Firestore: $e');
-    }
-  }
-
-  void _createOrGetGroupId() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String email = user.email!;
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(email)
-            .get();
-        if (userDoc.exists) {
-          setState(() {
-            _groupId = userDoc['groupId'];
-          });
-          if (_groupId == null) {
-            // Jika ID grup belum ada, buat ID baru dan simpan ke Firestore.
-            String newGroupId = FirebaseFirestore.instance
-                .collection('groups')
-                .doc()
-                .id; // Membuat ID grup baru
-            FirebaseFirestore.instance.collection('users').doc(email).update({
-              'groupId': newGroupId
-            }); // Menyimpan ID grup ke dokumen pengguna
-            setState(() {
-              _groupId = newGroupId;
-            });
-          }
-        }
-      }
-    } catch (e) {
-      print('Error creating or getting group ID: $e');
     }
   }
 
