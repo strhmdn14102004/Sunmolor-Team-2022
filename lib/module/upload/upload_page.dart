@@ -21,6 +21,7 @@ class _UploadPageState extends State<UploadPage> {
   final TextEditingController _folderController = TextEditingController();
   String? _selectedFolder;
   File? _image;
+  List<File> _images = [];
   final picker = ImagePicker();
   double _uploadProgress = 0.0;
   bool _isDownloading = false;
@@ -59,44 +60,56 @@ class _UploadPageState extends State<UploadPage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> _pickImages() async {
+    final pickedFiles = await picker.pickMultiImage();
 
     setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        _images =
+            pickedFiles.map((pickedFile) => File(pickedFile.path)).toList();
       } else {
-        print('No image selected.');
+        print('No images selected.');
       }
     });
   }
 
-  Future<void> _uploadFile() async {
-    if (_image != null && _selectedFolder != null) {
-      String fileName = Path.basename(_image!.path);
-      Reference storageReference = FirebaseStorage.instance
-          .ref()
-          .child('uploads/$_selectedFolder/$fileName');
-      UploadTask uploadTask = storageReference.putFile(_image!);
+  Future<void> _uploadFiles() async {
+    if (_images.isNotEmpty && _selectedFolder != null) {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      String uploaderEmail = user.email!;
 
-      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-        setState(() {
-          _uploadProgress = snapshot.bytesTransferred.toDouble() /
-              snapshot.totalBytes.toDouble();
+      for (var image in _images) {
+        String fileName = Path.basename(image.path);
+        Reference storageReference = FirebaseStorage.instance
+            .ref()
+            .child('uploads/$_selectedFolder/$fileName');
+        UploadTask uploadTask = storageReference.putFile(image);
+
+        uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+          setState(() {
+            _uploadProgress = snapshot.bytesTransferred.toDouble() /
+                snapshot.totalBytes.toDouble();
+          });
         });
-      });
 
-      await uploadTask.whenComplete(() => null);
-      String downloadURL = await storageReference.getDownloadURL();
+        await uploadTask.whenComplete(() => null);
+        String downloadURL = await storageReference.getDownloadURL();
 
-      await FirebaseFirestore.instance
-          .collection('uploads')
-          .doc(_selectedFolder)
-          .collection('images')
-          .add({'url': downloadURL, 'fileName': fileName});
+        await FirebaseFirestore.instance
+            .collection('uploads')
+            .doc(_selectedFolder)
+            .collection('images')
+            .add({
+          'url': downloadURL,
+          'nama_file': fileName,
+          'tanggal_upload': DateTime.now(),
+          'diupload_oleh': uploaderEmail,
+        });
+      }
 
       setState(() {
-        _image = null;
+        _images = [];
         _uploadProgress = 0.0;
       });
 
@@ -352,10 +365,28 @@ class _UploadPageState extends State<UploadPage> {
                   },
                 ),
               ),
-              const SizedBox(height: 20),
-              _image == null
-                  ? const Text('Tidak ada photo untuk diupload.')
-                  : Image.file(_image!),
+              Wrap(
+                spacing: 10,
+                children: _images
+                    .map((image) => Stack(
+                          children: [
+                            Image.file(image, width: 100, height: 100),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: IconButton(
+                                icon: Icon(Icons.cancel, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    _images.remove(image);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ))
+                    .toList(),
+              ),
               const SizedBox(height: 20),
               if (_uploadProgress > 0)
                 Padding(
@@ -376,7 +407,7 @@ class _UploadPageState extends State<UploadPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[100],
                       ),
-                      onPressed: _pickImage,
+                      onPressed: _pickImages,
                       child: const Icon(Icons.photo_library_rounded,
                           color: Colors.black),
                     ),
@@ -384,7 +415,7 @@ class _UploadPageState extends State<UploadPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[100],
                       ),
-                      onPressed: _uploadFile,
+                      onPressed: _uploadFiles,
                       child: const Icon(
                         Icons.upload_file_outlined,
                         color: Colors.black,
@@ -402,7 +433,7 @@ class _UploadPageState extends State<UploadPage> {
                         shrinkWrap: true,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
+                          crossAxisCount: 3,
                           childAspectRatio: 1,
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
@@ -431,7 +462,7 @@ class _UploadPageState extends State<UploadPage> {
                             physics: const NeverScrollableScrollPhysics(),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                              crossAxisCount: 3,
                               childAspectRatio: 1,
                               crossAxisSpacing: 10,
                               mainAxisSpacing: 10,

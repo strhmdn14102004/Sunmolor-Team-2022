@@ -327,8 +327,7 @@ class _HomePageState extends State<HomePage> {
                               GroupChatPage(groupId: _groupId.toString())),
                     );
                   },
-                  child: const Icon(Icons.chat_bubble_outline,
-                      color: Colors.black),
+                  child: const Icon(Icons.chat, color: Colors.black),
                 ),
               ),
             ),
@@ -345,7 +344,8 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(builder: (context) => UploadPage()),
                     );
                   },
-                  child: const Icon(Icons.upload, color: Colors.black),
+                  child:
+                      const Icon(Icons.cloud_upload_sharp, color: Colors.black),
                 ),
               ),
             ),
@@ -452,21 +452,50 @@ class _HomePageState extends State<HomePage> {
                                   ? nama_kendaraan
                                   : 'Perbarui Info kendaraan',
                               style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white),
+                              textAlign: TextAlign.center,
                             ),
-                            Text(
-                              Nomor_polisi_kendaraan.isNotEmpty
-                                  ? Nomor_polisi_kendaraan
-                                  : 'Isi data kendaraan terlebih dahulu',
-                              style: const TextStyle(color: Colors.white),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  Nomor_polisi_kendaraan.isNotEmpty
+                                      ? Nomor_polisi_kendaraan
+                                      : 'Isi data kendaraan terlebih dahulu',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 100),
+                                  child: Text(
+                                    pabrikan_asal.isNotEmpty
+                                        ? pabrikan_asal
+                                        : 'Isi data kendaraan terlebih dahulu',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              Exp_pajak.isNotEmpty
-                                  ? Exp_pajak
-                                  : 'Isi data kendaraan terlebih dahulu',
-                              style: const TextStyle(color: Colors.white),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  Exp_pajak.isNotEmpty
+                                      ? Exp_pajak
+                                      : 'Isi data kendaraan terlebih dahulu',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 66),
+                                  child: Text(
+                                    jenis_bbm.isNotEmpty
+                                        ? jenis_bbm
+                                        : 'Isi data kendaraan terlebih dahulu',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
                             )
                           ],
                         ),
