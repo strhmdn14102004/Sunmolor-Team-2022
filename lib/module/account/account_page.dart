@@ -389,21 +389,33 @@ class _AccountPageState extends State<AccountPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Konfirmasi Logout"),
-          content: const Text("Apakah Anda yakin ingin logout?"),
+          backgroundColor: Colors.black87,
+          title: const Text(
+            "Konfirmasi Logout",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          content: const Text(
+            "Apakah Anda yakin ingin logout?",
+            style: TextStyle(color: Colors.white),
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("Batal"),
+              child: const Text(
+                "Batal",
+                style: TextStyle(color: Colors.red),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _logout(context);
               },
-              child: const Text("Ya, Logout"),
+              child: const Text("Logout",
+                  style: TextStyle(
+                      color: Colors.green, fontWeight: FontWeight.bold)),
             ),
           ],
         );
