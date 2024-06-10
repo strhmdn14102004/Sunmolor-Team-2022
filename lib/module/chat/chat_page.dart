@@ -158,7 +158,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                       controller: _messageController,
                       decoration: InputDecoration(
                         fillColor: Colors.black26,
-                        hintText: 'Send a message...',
+                        hintText: '  Kirim sebuah pesan...',
                         hintStyle: const TextStyle(color: Colors.white),
                         filled: true,
                         contentPadding: const EdgeInsets.all(10),
@@ -171,7 +171,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Colors.black),
+                  icon: const Icon(Icons.send_rounded, color: Colors.black),
                   onPressed: () {
                     String text = _messageController.text.trim();
                     if (text.isNotEmpty) {

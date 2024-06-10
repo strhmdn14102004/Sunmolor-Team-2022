@@ -268,7 +268,7 @@ class _UploadPageState extends State<UploadPage> {
                 value: 0,
                 child: Row(
                   children: [
-                    Icon(Icons.select_all_outlined, color: Colors.black),
+                    Icon(Icons.select_all_rounded, color: Colors.black),
                     SizedBox(width: 8),
                     Text('Pilih Semua'),
                   ],
@@ -278,7 +278,7 @@ class _UploadPageState extends State<UploadPage> {
                 value: 1,
                 child: Row(
                   children: [
-                    Icon(Icons.cancel_outlined, color: Colors.black),
+                    Icon(Icons.cancel, color: Colors.red),
                     SizedBox(width: 8),
                     Text('Batalkan Pilihan'),
                   ],
@@ -288,7 +288,8 @@ class _UploadPageState extends State<UploadPage> {
                 value: 2,
                 child: Row(
                   children: [
-                    Icon(Icons.download, color: Colors.black),
+                    Icon(Icons.download_for_offline_rounded,
+                        color: Colors.green),
                     SizedBox(width: 8),
                     Text('Download Semua yang dipilih'),
                   ],
@@ -319,7 +320,7 @@ class _UploadPageState extends State<UploadPage> {
                       border: InputBorder.none,
                       suffixIcon: IconButton(
                         icon: const Icon(
-                          Icons.create_new_folder_outlined,
+                          Icons.create_new_folder_rounded,
                           color: Colors.black,
                         ),
                         onPressed: () {
@@ -417,7 +418,7 @@ class _UploadPageState extends State<UploadPage> {
                       ),
                       onPressed: _uploadFiles,
                       child: const Icon(
-                        Icons.upload_file_outlined,
+                        Icons.upload_file_rounded,
                         color: Colors.black,
                       ),
                     ),

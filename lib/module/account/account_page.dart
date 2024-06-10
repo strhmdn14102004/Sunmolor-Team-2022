@@ -126,7 +126,12 @@ class _AccountPageState extends State<AccountPage> {
         return StatefulBuilder(
           builder: (BuildContext context, setState) {
             return AlertDialog(
-              title: const Text("Pilih Akun dan Status"),
+              title: const Text(
+                "Pilih\nAkun dan Status",
+                style: TextStyle(),
+                textAlign: TextAlign.center,
+              ),
+              alignment: Alignment.center,
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -169,7 +174,7 @@ class _AccountPageState extends State<AccountPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text("Batal"),
+                  child: const Icon(Icons.cancel, color: Colors.red),
                 ),
                 TextButton(
                   onPressed: () {
@@ -179,7 +184,7 @@ class _AccountPageState extends State<AccountPage> {
                       Navigator.of(context).pop();
                     }
                   },
-                  child: const Text("Simpan"),
+                  child: const Icon(Icons.save, color: Colors.green),
                 ),
               ],
             );
