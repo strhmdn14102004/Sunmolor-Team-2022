@@ -112,10 +112,10 @@ class _UploadPageState extends State<UploadPage> {
       );
     } else {
       Navigator.of(context).push(
-      ErrorOverlay(
-        message: "Tidak ada photo untuk diupload\nPilih foto terlebih dahulu",
-      ),
-    );
+        ErrorOverlay(
+          message: "Tidak ada photo untuk diupload\nPilih foto terlebih dahulu",
+        ),
+      );
     }
   }
 
@@ -156,33 +156,38 @@ class _UploadPageState extends State<UploadPage> {
       _isDownloading = true;
       _downloadProgress = 0.0;
     });
+
     final Reference ref = FirebaseStorage.instance.refFromURL(url);
     final Directory? tempDir = await getExternalStorageDirectory();
     final Directory downloadDir =
         Directory('${tempDir!.path}/sunmolor_team_photos');
+
     if (!await downloadDir.exists()) {
       await downloadDir.create(recursive: true);
     }
+
     final File file = File('${downloadDir.path}/${ref.name}');
     final downloadTask = ref.writeToFile(file);
+
     downloadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
       setState(() {
         _downloadProgress = snapshot.bytesTransferred.toDouble() /
             snapshot.totalBytes.toDouble();
       });
     });
+
     await downloadTask.whenComplete(() {
       setState(() {
         _isDownloading = false;
         _downloadProgress = 0.0;
       });
-    });
 
-    Navigator.of(context).push(
-      SuccessOverlay(
-        message: "Photo Berhasil Disimpan di ${file.path}",
-      ),
-    );
+      Navigator.of(context).push(
+        SuccessOverlay(
+          message: "Photo Berhasil Disimpan di ${file.path}",
+        ),
+      );
+    });
   }
 
   Future<void> _deletePhoto(
@@ -439,7 +444,27 @@ class _UploadPageState extends State<UploadPage> {
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Text('Tidak ada photo di folder ini');
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Lottie.asset(
+                              "assets/lottie/no.json",
+                              frameRate: const FrameRate(60),
+                              width: Dimensions.size100 * 2,
+                              repeat: true,
+                            ),
+                            Text(
+                              "Tidak ada photo di folder ini...",
+                              style: TextStyle(
+                                fontSize: Dimensions.text20,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     } else {
                       _allPhotos = List.from(snapshot.data!);
                       return Column(
@@ -481,15 +506,25 @@ class _UploadPageState extends State<UploadPage> {
                                                   padding:
                                                       const EdgeInsets.only(
                                                           top: 16.0),
-                                                  child:
+                                                  child: Column(
+                                                    children: [
+                                                      Lottie.asset(
+                                                        'assets/lottie/download.json', // Your Lottie animation file
+                                                        width: 100,
+                                                        height: 100,
+                                                      ),
                                                       LinearProgressIndicator(
-                                                    value: _downloadProgress,
-                                                    minHeight: 10,
-                                                    backgroundColor:
-                                                        Colors.grey[200],
-                                                    valueColor:
-                                                        const AlwaysStoppedAnimation<
-                                                            Color>(Colors.blue),
+                                                        value:
+                                                            _downloadProgress,
+                                                        minHeight: 10,
+                                                        backgroundColor:
+                                                            Colors.grey[200],
+                                                        valueColor:
+                                                            const AlwaysStoppedAnimation<
+                                                                    Color>(
+                                                                Colors.blue),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               const SizedBox(height: 10),
@@ -561,70 +596,6 @@ class _UploadPageState extends State<UploadPage> {
                 ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class SuccesseOverlay extends StatefulWidget {
-  final String message;
-  final int countdownSeconds;
-
-  SuccesseOverlay({
-    required this.message,
-    this.countdownSeconds = 3,
-  });
-
-  @override
-  _SuccesseOverlayState createState() => _SuccesseOverlayState();
-}
-
-class _SuccesseOverlayState extends State<SuccesseOverlay> {
-  late int countdown;
-
-  @override
-  void initState() {
-    super.initState();
-    countdown = widget.countdownSeconds;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      child: SafeArea(
-        child: _buildOverlayContent(context),
-      ),
-    );
-  }
-
-  Widget _buildOverlayContent(BuildContext context) {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.all(Dimensions.size20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Lottie.asset(
-              "assets/lottie/success.json",
-              frameRate: const FrameRate(60),
-              width: Dimensions.size100 * 2,
-              repeat: true,
-            ),
-            SizedBox(
-              height: Dimensions.size50,
-            ),
-            Text(
-              widget.message,
-              style: TextStyle(
-                fontSize: Dimensions.text20,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
         ),
       ),
     );

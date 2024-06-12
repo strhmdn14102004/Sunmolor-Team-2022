@@ -570,7 +570,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black38,
+                    ),
                     onPressed: () {
                       Navigator.of(context).push(
                         CommingSoonOverlay(
@@ -578,7 +584,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
-                    child: Text("Lihat Lokasi Teman saya")),
+                    child: const Text("Lihat Lokasi Teman saya",
+                        style: TextStyle(color: Colors.white))),
               )
             ],
           ),
