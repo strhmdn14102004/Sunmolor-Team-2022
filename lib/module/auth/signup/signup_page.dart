@@ -6,7 +6,7 @@ import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/module/auth/signup/verify_data_diri_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
-import 'package:sunmolor_team/overlay/success_overlay.dart';
+import 'package:sunmolor_team/overlay/register.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key});
@@ -39,7 +39,7 @@ class _SignUpState extends State<SignUp> {
             builder: (context) => VerifyDataPage()), // Navigate back to login
       );
       Navigator.of(context).push(
-        SuccessOverlay(
+        RegisterOverlay(
           message:
               "Register akun dengan email\n${userCredential.user!.email}\nBerhasil lanjutkan isi\nData diri anda",
         ),

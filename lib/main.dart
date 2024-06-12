@@ -98,7 +98,7 @@ class MyApp extends StatelessWidget {
         overlayOpacity: 0.8,
         child: GetMaterialApp(
           scaffoldMessengerKey: scaffoldMessengerKey,
-          title: "Muslim",
+          title: "Sunmolor Team",
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             useMaterial3: true,

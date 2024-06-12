@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
 
@@ -38,23 +39,28 @@ class _GroupChatPageState extends State<GroupChatPage> {
         if (userDoc.exists) {
           String fullName = userDoc['fullName'];
           await FirebaseFirestore.instance
-              .collection('groupChats')
-              .doc(widget.groupId)
-              .collection('messages')
+              .collection('Sunmolor Team Chat Group')
+              .doc('Chat Group')
+              .collection('Pesan')
               .add({
-            'sender': fullName,
-            'text': text,
-            'timestamp': FieldValue.serverTimestamp(),
+            'Pengirim': fullName,
+            'Pesan': text,
+            'Tanggal Dikirim Pesan': FieldValue.serverTimestamp(),
           });
         }
       }
     } catch (e) {
+      Navigator.of(context).push(
+        ErrorOverlay(
+          message: "$e",
+        ),
+      );
       print('Error sending message: $e');
     }
   }
 
   Widget _buildMessageItem(DocumentSnapshot message) {
-    bool isMe = message['sender'] == FirebaseAuth.instance.currentUser?.email;
+    bool isMe = message['Pengirim'] == FirebaseAuth.instance.currentUser?.email;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: Column(
@@ -62,7 +68,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
             isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            message['sender'],
+            message['Pengirim'],
             style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
           const SizedBox(height: 5),
@@ -72,7 +78,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
             children: [
               if (!isMe)
                 CircleAvatar(
-                  child: Text(message['sender'][0]),
+                  child: Text(message['Pengirim'][0]),
                 ),
               if (!isMe) const SizedBox(width: 10),
               Flexible(
@@ -85,7 +91,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    message['text'],
+                    message['Pesan'],
                     style: const TextStyle(color: Colors.black),
                   ),
                 ),
@@ -123,10 +129,10 @@ class _GroupChatPageState extends State<GroupChatPage> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('groupChats')
-                  .doc(widget.groupId)
-                  .collection('messages')
-                  .orderBy('timestamp', descending: true)
+                  .collection('Sunmolor Team Chat Group')
+                  .doc('Chat Group')
+                  .collection('Pesan')
+                  .orderBy('Tanggal Dikirim Pesan', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
@@ -144,11 +150,27 @@ class _GroupChatPageState extends State<GroupChatPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const CircularProgressIndicator(),
-                        SizedBox(
-                          height: Dimensions.size10,
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Lottie.asset(
+                                "assets/lottie/load_message.json",
+                                frameRate: const FrameRate(60),
+                                width: 200,
+                                repeat: true,
+                              ),
+                              Text(
+                                "Memuat data chat...",
+                                style: TextStyle(
+                                  fontSize: Dimensions.text20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const Text("Tunggu sebentar pesan sedang dimuat")
                       ],
                     ),
                   );

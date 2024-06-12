@@ -6,6 +6,7 @@ import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.d
 import 'package:sunmolor_team/module/auth/signup/signup_page.dart';
 import 'package:sunmolor_team/module/home/home_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
+import 'package:sunmolor_team/overlay/no_data_account.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
       print('Sign in error: $_errorMessage');
 
       Navigator.of(context).push(
-        ErrorOverlay(
+        ErrorNoDataAccount(
           message: "Login Gagal\nPeriksa Kembali Password Kamu",
         ),
       );

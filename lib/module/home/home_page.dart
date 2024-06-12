@@ -491,7 +491,7 @@ class _HomePageState extends State<HomePage> {
                                     child: Text(
                                       pabrikan_asal.isNotEmpty
                                           ? pabrikan_asal
-                                          : 'Isi data kendaraan terlebih dahulu',
+                                          : '',
                                       style:
                                           const TextStyle(color: Colors.white),
                                     ),
@@ -513,7 +513,7 @@ class _HomePageState extends State<HomePage> {
                                     child: Text(
                                       jenis_bbm.isNotEmpty
                                           ? jenis_bbm
-                                          : 'Isi data kendaraan terlebih dahulu',
+                                          : '',
                                       style:
                                           const TextStyle(color: Colors.white),
                                     ),
