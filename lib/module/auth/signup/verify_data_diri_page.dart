@@ -341,6 +341,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
         'address': address,
         'phoneNumber': phoneNumber,
         'birthDate': birthDate,
+        'backgroundImageURL': '',
         'gender': gender,
         'profileImageURL':
             _image != null ? await _uploadImageToFirebaseStorage() : null,
@@ -371,22 +372,20 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
   }
 
   Future<String> _uploadImageToFirebaseStorage() async {
-  try {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception('User is not authenticated');
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User is not authenticated');
+      }
+      String userEmail = user.email ?? '';
+      Reference ref = FirebaseStorage.instance.ref().child('user_images').child(
+          '$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
+      await ref.putFile(_image!);
+      String imageUrl = await ref.getDownloadURL();
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image to Firebase Storage: $e');
+      throw e;
     }
-    String userEmail = user.email ?? '';
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('user_images')
-        .child('$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
-    await ref.putFile(_image!);
-    String imageUrl = await ref.getDownloadURL();
-    return imageUrl;
-  } catch (e) {
-    print('Error uploading image to Firebase Storage: $e');
-    throw e;
   }
-}
 }

@@ -15,6 +15,7 @@ import 'package:sunmolor_team/module/home/home_bloc.dart';
 import 'package:sunmolor_team/module/home/home_state.dart';
 import 'package:sunmolor_team/module/kendaraan/kendaraan_page.dart';
 import 'package:sunmolor_team/module/upload/upload_page.dart';
+import 'package:sunmolor_team/overlay/comming_soon.dart';
 
 import '../../../helper/app_colors.dart';
 
@@ -568,6 +569,17 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
+              Container(
+                child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        CommingSoonOverlay(
+                          message: "COMMING SOON",
+                        ),
+                      );
+                    },
+                    child: Text("Lihat Lokasi Teman saya")),
+              )
             ],
           ),
         ),

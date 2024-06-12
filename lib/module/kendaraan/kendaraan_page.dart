@@ -467,8 +467,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('kendaraan_images')
-          .child(
-              '$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
+          .child('$userEmail.jpg');
       await ref.putFile(_image!);
       String imageUrl = await ref.getDownloadURL();
       return imageUrl;

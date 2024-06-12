@@ -72,6 +72,7 @@ class _AccountPageState extends State<AccountPage> {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[100],
+            
             padding: const EdgeInsets.symmetric(vertical: 15),
             minimumSize: const Size(double.infinity, 50),
           ),
