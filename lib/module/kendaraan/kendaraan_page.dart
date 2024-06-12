@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
+import 'package:sunmolor_team/overlay/no_account_registered.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
 
 class KendaraanPage extends StatefulWidget {
@@ -374,7 +375,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
       String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
         Navigator.of(context).push(
-          ErrorOverlay(
+          ErrorNoAccount(
             message: "Akun tidak ada. Cek Akunmu\nAtau coba login ulang",
           ),
         );

@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
+import 'package:sunmolor_team/overlay/no_account_registered.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
 
 class AccountFormPage extends StatefulWidget {
@@ -376,7 +377,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
       String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
         Navigator.of(context).push(
-          ErrorOverlay(
+          ErrorNoAccount(
             message: "Akun tidak ada. Cek Akunmu\nAtau coba login ulang",
           ),
         );

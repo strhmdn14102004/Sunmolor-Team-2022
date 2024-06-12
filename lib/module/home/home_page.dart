@@ -366,7 +366,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Lottie.asset(
-              "assets/lottie/loading_clock.json",
+              "assets/lottie/motor.json",
               frameRate: const FrameRate(60),
               width: Dimensions.size100 * 2,
               repeat: true,
@@ -511,9 +511,7 @@ class _HomePageState extends State<HomePage> {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 30),
                                     child: Text(
-                                      jenis_bbm.isNotEmpty
-                                          ? jenis_bbm
-                                          : '',
+                                      jenis_bbm.isNotEmpty ? jenis_bbm : '',
                                       style:
                                           const TextStyle(color: Colors.white),
                                     ),
