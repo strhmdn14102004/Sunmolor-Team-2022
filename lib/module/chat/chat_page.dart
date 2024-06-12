@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
+import 'package:sunmolor_team/overlay/error_overlay.dart';
 
 class GroupChatPage extends StatefulWidget {
   final String groupId;
@@ -17,6 +18,16 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
   void _sendMessage(String text) async {
     try {
+      String? email = FirebaseAuth.instance.currentUser?.email;
+      if (email == null) {
+        Navigator.of(context).push(
+          ErrorOverlay(
+            message: "Akun tidak ada. Cek Akunmu\nAtau coba login ulang",
+          ),
+        );
+        print('User email is null');
+        return;
+      }
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String email = user.email!;

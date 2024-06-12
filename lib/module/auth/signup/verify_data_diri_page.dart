@@ -120,152 +120,155 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
     User? user = FirebaseAuth.instance.currentUser;
     String email = user != null ? user.email ?? "" : "";
     return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                "Hallo",
-                style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic),
-              ),
-              SizedBox(
-                height: Dimensions.size5,
-              ),
-              Text(
-                email,
-                style: const TextStyle(fontSize: 20),
-              ),
-              SizedBox(
-                height: Dimensions.size20,
-              ),
-              GestureDetector(
-                onTap: () {
-                  _selectImage(context);
-                },
-                child: CircleAvatar(
-                  radius: 70,
-                  backgroundImage: _image != null
-                      ? FileImage(_image!) as ImageProvider<Object>?
-                      : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 50),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  "Hallo",
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic),
                 ),
-              ),
-              SizedBox(height: Dimensions.size10),
-              const Text("Klik image untuk mengupload photo profile"),
-              SizedBox(height: Dimensions.size30),
-              TextFormField(
-                controller: _fullNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Lengkap',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                SizedBox(
+                  height: Dimensions.size5,
+                ),
+                Text(
+                  email,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                SizedBox(
+                  height: Dimensions.size20,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _selectImage(context);
+                  },
+                  child: CircleAvatar(
+                    radius: 70,
+                    backgroundImage: _image != null
+                        ? FileImage(_image!) as ImageProvider<Object>?
+                        : (_imageUrl != null ? NetworkImage(_imageUrl!) : null),
+                  ),
+                ),
+                SizedBox(height: Dimensions.size10),
+                const Text("Klik image untuk mengupload photo profile"),
+                SizedBox(height: Dimensions.size30),
+                TextFormField(
+                  controller: _fullNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Lengkap',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0), // Adjust the radius as needed
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _nickNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Panggilan',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _nickNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Panggilan',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0), // Adjust the radius as needed
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _addressController,
-                decoration: const InputDecoration(
-                  labelText: 'Alamat Lengkap',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Alamat Lengkap',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0), // Adjust the radius as needed
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                controller: _phoneNumberController,
-                decoration: const InputDecoration(
-                  labelText: 'No Handphone',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                const SizedBox(height: 16),
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  controller: _phoneNumberController,
+                  decoration: const InputDecoration(
+                    labelText: 'No Handphone',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0), // Adjust the radius as needed
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  _selectDate(context);
-                },
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    controller: _birthDateController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tanggal Lahir',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20.0), // Adjust the radius as needed
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () {
+                    _selectDate(context);
+                  },
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      controller: _birthDateController,
+                      decoration: const InputDecoration(
+                        labelText: 'Tanggal Lahir',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(
+                                20.0), // Adjust the radius as needed
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _gender,
-                onChanged: (value) {
-                  setState(() {
-                    _gender = value!;
-                  });
-                },
-                items: <String>['', 'Pria', 'Wanita', 'Other']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0), // Adjust the radius as needed
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _gender,
+                  onChanged: (value) {
+                    setState(() {
+                      _gender = value!;
+                    });
+                  },
+                  items: <String>['', 'Pria', 'Wanita', 'Other']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0), // Adjust the radius as needed
+                      ),
                     ),
+                    labelText: 'Jenis Kelamin',
                   ),
-                  labelText: 'Jenis Kelamin',
                 ),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  _uploadDataToFirestore(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15), // Increase padding
-                  minimumSize:
-                      const Size(double.infinity, 50), // Set button size
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () {
+                    _uploadDataToFirestore(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15), // Increase padding
+                    minimumSize:
+                        const Size(double.infinity, 50), // Set button size
+                  ),
+                  child: const Text(
+                    'Simpan',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
-                child: const Text(
-                  'Simpan',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -368,17 +371,22 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
   }
 
   Future<String> _uploadImageToFirebaseStorage() async {
-    try {
-      Reference ref = FirebaseStorage.instance
-          .ref()
-          .child('user_images')
-          .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
-      await ref.putFile(_image!);
-      String imageUrl = await ref.getDownloadURL();
-      return imageUrl;
-    } catch (e) {
-      print('Error uploading image to Firebase Storage: $e');
-      throw e; // Re-throw error to handle it in the caller function
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User is not authenticated');
     }
+    String userEmail = user.email ?? '';
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child('user_images')
+        .child('$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
+    await ref.putFile(_image!);
+    String imageUrl = await ref.getDownloadURL();
+    return imageUrl;
+  } catch (e) {
+    print('Error uploading image to Firebase Storage: $e');
+    throw e;
   }
+}
 }

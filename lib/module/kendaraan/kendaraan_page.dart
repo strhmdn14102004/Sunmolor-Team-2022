@@ -373,6 +373,11 @@ class _KendaraanPageState extends State<KendaraanPage> {
     try {
       String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
+        Navigator.of(context).push(
+          ErrorOverlay(
+            message: "Akun tidak ada. Cek Akunmu\nAtau coba login ulang",
+          ),
+        );
         print('User email is null');
         return;
       }
@@ -433,7 +438,8 @@ class _KendaraanPageState extends State<KendaraanPage> {
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-            builder: (context) => const LoginScreen()), // Navigate back to login
+            builder: (context) =>
+                const LoginScreen()), // Navigate back to login
       );
       Navigator.of(context).push(
         SuccessOverlay(
@@ -453,10 +459,16 @@ class _KendaraanPageState extends State<KendaraanPage> {
 
   Future<String> _uploadImageToFirebaseStorage() async {
     try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User is not authenticated');
+      }
+      String userEmail = user.email ?? '';
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('kendaraan_images')
-          .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+          .child(
+              '$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
       await ref.putFile(_image!);
       String imageUrl = await ref.getDownloadURL();
       return imageUrl;

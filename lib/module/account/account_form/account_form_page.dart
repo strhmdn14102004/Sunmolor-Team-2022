@@ -375,6 +375,11 @@ class _AccountFormPageState extends State<AccountFormPage> {
     try {
       String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
+        Navigator.of(context).push(
+          ErrorOverlay(
+            message: "Akun tidak ada. Cek Akunmu\nAtau coba login ulang",
+          ),
+        );
         print('User email is null');
         return;
       }
@@ -434,18 +439,23 @@ class _AccountFormPageState extends State<AccountFormPage> {
     }
   }
 
-  Future<String> _uploadImageToFirebaseStorage() async {
-    try {
-      Reference ref = FirebaseStorage.instance
-          .ref()
-          .child('user_images')
-          .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
-      await ref.putFile(_image!);
-      String imageUrl = await ref.getDownloadURL();
-      return imageUrl;
-    } catch (e) {
-      print('Error uploading image to Firebase Storage: $e');
-      throw e;
+ Future<String> _uploadImageToFirebaseStorage() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User is not authenticated');
     }
+    String userEmail = user.email ?? '';
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child('user_images')
+        .child('$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
+    await ref.putFile(_image!);
+    String imageUrl = await ref.getDownloadURL();
+    return imageUrl;
+  } catch (e) {
+    print('Error uploading image to Firebase Storage: $e');
+    throw e;
   }
+}
 }

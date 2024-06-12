@@ -6,6 +6,7 @@ import 'package:sunmolor_team/module/account/account_form/account_form_page.dart
 import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/module/kendaraan/kendaraan_page.dart';
+import 'package:sunmolor_team/overlay/success_overlay.dart';
 
 class AccountPage extends StatefulWidget {
   @override
@@ -26,7 +27,8 @@ class _AccountPageState extends State<AccountPage> {
   bool isFounder = false;
   List<String> _accountEmails = [];
   String? _backgroundImageUrl;
-
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
   @override
   void initState() {
     super.initState();
@@ -70,8 +72,7 @@ class _AccountPageState extends State<AccountPage> {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[100],
-            padding:
-                const EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             minimumSize: const Size(double.infinity, 50),
           ),
           child: const Text(
@@ -83,6 +84,124 @@ class _AccountPageState extends State<AccountPage> {
       );
     } else {
       return const SizedBox();
+    }
+  }
+
+  Widget _buildDeleteAccountButton() {
+    return Container(
+      width: 200,
+      child: ElevatedButton(
+        onPressed: () {
+          _showPasswordInputDialog(context);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue[100],
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          minimumSize: const Size(double.infinity, 50),
+        ),
+        child: const Text(
+          'Delete Account',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPasswordInputDialog(BuildContext context) {
+    final TextEditingController _passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black54,
+          title: const Text(
+            "Masukkan Password\nUntuk Menghapus Akun Anda",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: TextField(
+            controller: _passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              hintText: 'Masukan Password Disini',
+              hintStyle: TextStyle(color: Colors.white70),
+            ),
+            style: const TextStyle(color: Colors.white),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Icon(Icons.cancel, color: Colors.red),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteAccount(context, _passwordController.text);
+              },
+              child: const Icon(Icons.delete_forever, color: Colors.green),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAccount(BuildContext context, String password) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && mounted) {
+      // Check if widget is mounted
+      String email = user.email!;
+      try {
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: email,
+          password: password,
+        );
+        await user.reauthenticateWithCredential(credential);
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(email)
+            .delete();
+        await FirebaseFirestore.instance
+            .collection('kendaraan')
+            .doc(email)
+            .delete();
+        await user.delete();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        if (mounted) {
+          // Check if widget is still mounted
+          _scaffoldMessengerKey.currentState?.showSnackBar(
+            const SnackBar(content: Text('Account deleted successfully')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+        }
+      } catch (e) {
+        print('Error deleting account: $e');
+        String errorMessage = 'Error deleting account';
+        if (e is FirebaseAuthException) {
+          if (e.code == 'invalid-credential') {
+            errorMessage =
+                'Invalid credentials. Please check your password and try again.';
+          } else if (e.code == 'wrong-password') {
+            errorMessage = 'Incorrect password. Please try again.';
+          }
+        }
+        if (mounted) {
+          // Check if widget is still mounted
+          _scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      }
     }
   }
 
@@ -170,7 +289,10 @@ class _AccountPageState extends State<AccountPage> {
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value,style: TextStyle(color: Colors.grey),),
+                        child: Text(
+                          value,
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       );
                     }).toList(),
                   ),
@@ -204,7 +326,7 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _toggleAdminStatus(String email, bool isAdmin) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(email).update({
-        'status': isAdmin ? 'admin' : 'member', // Update user status
+        'status': isAdmin ? 'admin' : 'member',
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -220,35 +342,32 @@ class _AccountPageState extends State<AccountPage> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        String email = user.email!; // Get the current user's email
-
+        String email = user.email!;
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
-            .doc(email) // Fetch the document based on email
+            .doc(email)
             .get();
 
         if (userDoc.exists) {
           setState(() {
-            // Update the state with data from Firestore
             fullName = userDoc['fullName'];
             nickName = userDoc['nickName'];
             address = userDoc['address'];
             phoneNumber = userDoc['phoneNumber'];
             birthDate = userDoc['birthDate'];
             gender = userDoc['gender'];
-
             loading = false;
           });
         } else {
           setState(() {
-            loading = false; // Data not found, stop showing shimmer
+            loading = false;
           });
         }
       }
     } catch (e) {
       print('Error loading user data from Firestore: $e');
       setState(() {
-        loading = false; // Error occurred, stop showing shimmer
+        loading = false;
       });
     }
   }
@@ -281,6 +400,46 @@ class _AccountPageState extends State<AccountPage> {
     String email = user != null ? user.email ?? "" : "";
 
     return Scaffold(
+      floatingActionButton: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 35),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: FloatingActionButton(
+                backgroundColor: Colors.blue[100],
+                heroTag: 'delete',
+                onPressed: () {
+                  _showPasswordInputDialog(context);
+                },
+                child: const Icon(
+                  Icons.no_accounts_rounded,
+                  color: Colors.red,
+                  size: 30,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 5),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
+                backgroundColor: Colors.blue[100],
+                heroTag: 'Logout',
+                onPressed: () {
+                  _showLogoutConfirmationDialog(context);
+                },
+                child: const Icon(
+                  Icons.logout,
+                  color: Colors.black,
+                  size: 30,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: _backgroundImageUrl != null
@@ -371,19 +530,10 @@ class _AccountPageState extends State<AccountPage> {
                   height: 20,
                 ),
                 _buildMakeAdminButton(),
+                const SizedBox(height: 20),
               ],
             ),
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue[100],
-        onPressed: () {
-          _showLogoutConfirmationDialog(context);
-        },
-        child: const Icon(
-          Icons.logout_outlined,
-          color: Colors.black,
         ),
       ),
     );
@@ -412,23 +562,19 @@ class _AccountPageState extends State<AccountPage> {
           ),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                "Batal",
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Icon(Icons.cancel, color: Colors.red)),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _logout(context);
-              },
-              child: const Text("Logout",
-                  style: TextStyle(
-                      color: Colors.green, fontWeight: FontWeight.bold)),
-            ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _logout(context);
+                },
+                child: Icon(
+                  Icons.door_front_door,
+                  color: Colors.green,
+                ))
           ],
         );
       },
