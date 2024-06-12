@@ -61,14 +61,21 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       print('User signed in: ${userCredential.user!.email}');
     } catch (e) {
+      String errorMessage = e.toString();
+      if (errorMessage.contains('[firebase_auth/channel-error]')) {
+        errorMessage = 'Isi username dan password terlebih dahulu';
+      } else if (errorMessage.contains('[firebase_auth/invalid-credential]')) {
+        errorMessage =
+            'Akun tidak ditemukan pastikan kamu Telah Register Akun.\nAtau Cek Kembali Password dan Email kamu';
+      }
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = errorMessage;
       });
       print('Sign in error: $_errorMessage');
 
       Navigator.of(context).push(
         ErrorNoDataAccount(
-          message: "Login Gagal\nPeriksa Kembali Password Kamu",
+          message: _errorMessage,
         ),
       );
     }

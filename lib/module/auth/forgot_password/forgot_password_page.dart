@@ -17,9 +17,30 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _errorMessage = '';
 
-  Future<void> _sendPasswordResetEmail(BuildContext context) async {
+  Future<bool> _doesEmailExist(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: _emailController.text);
+      var methods = await _auth.fetchSignInMethodsForEmail(email);
+      return methods.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> _sendPasswordResetEmail(BuildContext context) async {
+    final email = _emailController.text;
+    final emailExists = await _doesEmailExist(email);
+
+    if (!emailExists) {
+      Navigator.of(context).push(
+        ErrorOverlay(
+          message: "Email tidak terdaftar.",
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
       _emailController.clear();
       setState(() {
         _errorMessage = '';
@@ -31,8 +52,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-            builder: (context) =>
-                const LoginScreen()), // Navigate back to login
+          builder: (context) => const LoginScreen(),
+        ),
       );
       Navigator.of(context).push(
         SuccessOverlay(
