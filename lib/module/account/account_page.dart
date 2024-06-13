@@ -6,7 +6,6 @@ import 'package:sunmolor_team/module/account/account_form/account_form_page.dart
 import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/module/kendaraan/kendaraan_page.dart';
-import 'package:sunmolor_team/overlay/success_overlay.dart';
 
 class AccountPage extends StatefulWidget {
   @override
@@ -72,7 +71,6 @@ class _AccountPageState extends State<AccountPage> {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[100],
-            
             padding: const EdgeInsets.symmetric(vertical: 15),
             minimumSize: const Size(double.infinity, 50),
           ),

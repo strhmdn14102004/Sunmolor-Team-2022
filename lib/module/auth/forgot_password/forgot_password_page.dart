@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
@@ -17,28 +18,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _errorMessage = '';
 
-  Future<bool> _doesEmailExist(String email) async {
-    try {
-      var methods = await _auth.fetchSignInMethodsForEmail(email);
-      return methods.isNotEmpty;
-    } catch (e) {
-      return false;
-    }
-  }
 
   Future<void> _sendPasswordResetEmail(BuildContext context) async {
     final email = _emailController.text;
-    final emailExists = await _doesEmailExist(email);
-
-    if (!emailExists) {
-      Navigator.of(context).push(
-        ErrorOverlay(
-          message: "Email tidak terdaftar.",
-        ),
-      );
-      return;
-    }
-
     try {
       await _auth.sendPasswordResetEmail(email: email);
       _emailController.clear();

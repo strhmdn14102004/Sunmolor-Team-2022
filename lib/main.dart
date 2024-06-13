@@ -34,6 +34,7 @@ void main() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   runApp(const MyApp());
 }
+
 Future<void> requestPermissions() async {
   Map<Permission, PermissionStatus> statuses = await [
     Permission.notification,

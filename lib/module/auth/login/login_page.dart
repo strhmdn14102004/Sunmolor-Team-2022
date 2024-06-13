@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: const Text(
                       'Lupa Password?',
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(),
                     ),
                   ),
                 ),
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   child: const Text(
                     'Belum memiliki akun? Daftar Sekarang',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(),
                   ),
                 ),
               ],

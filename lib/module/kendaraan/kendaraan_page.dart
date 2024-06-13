@@ -331,7 +331,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                       ),
                   ),
                 ),
               ],

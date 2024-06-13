@@ -334,7 +334,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                     'Simpan',
                     style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black,
+                      
                         fontWeight: FontWeight.bold),
                   ),
                 ),

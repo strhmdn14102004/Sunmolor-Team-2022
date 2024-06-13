@@ -147,7 +147,7 @@ Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
                   },
                   child: const Text(
                     'Sudah punya akun? Login',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(),
                   ),
                 ),
               ],
