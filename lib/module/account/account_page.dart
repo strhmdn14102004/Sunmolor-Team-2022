@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sunmolor_team/module/account/account_form/account_form_page.dart';
+import 'package:sunmolor_team/module/auth/email/change_email_page.dart';
 import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/module/kendaraan/kendaraan_page.dart';
@@ -522,6 +523,34 @@ class _AccountPageState extends State<AccountPage> {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChangeEmailPage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[100],
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    child: const Text(
+                      'Verifikasi Email',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
