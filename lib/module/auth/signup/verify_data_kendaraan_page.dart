@@ -108,7 +108,7 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
     String email = user != null ? user.email ?? "" : "";
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(top: 50),
+        padding: const EdgeInsets.only(top: 150),
         child: SingleChildScrollView(
           child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -120,6 +120,7 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
                         _selectImage(context);
                       },
                       child: CircleAvatar(
+                        backgroundColor: Colors.orange[200],
                         radius: 70,
                         backgroundImage: _image != null
                             ? FileImage(_image!) as ImageProvider<Object>?
@@ -226,7 +227,8 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
                         'Honda',
                         'Yamaha',
                         'Piaggio',
-                        'Suzuki'
+                        'Suzuki',
+                        'Kawasaki'
                       ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -248,12 +250,14 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
                         _uploadDataToFirestore(context);
                       },
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Simpan',
-                        style: TextStyle(fontSize: 16),
+                        style:
+                            TextStyle(fontSize: 16, color: Colors.orange[200]),
                       ),
                     ),
                   ])),
@@ -321,13 +325,11 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
           return const Center(
             child: CircularProgressIndicator(
               value: null,
-              strokeWidth: 6, // Ketebalan progres lingkaran
+              strokeWidth: 6,
             ),
           );
         },
       );
-
-      // Menyimpan data ke Firestore
       await FirebaseFirestore.instance.collection('kendaraan').doc(email).set({
         'Nama Kendaraan': fullName,
         'Nomor Polisi Kendaraan': nickName,
@@ -337,15 +339,11 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
         'kendaraanImageURL':
             _image != null ? await _uploadImageToFirebaseStorage() : null,
       });
-
-      // Navigasi kembali ke halaman login setelah pengunggahan berhasil
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const LoginScreen(),
         ),
       );
-
-      // Tampilkan overlay kesuksesan
       Navigator.of(context).push(
         SuccessOverlay(
           message: "Data Kendaraan Berhasil Diupload\nRegister Akun Berhasil",
@@ -353,7 +351,7 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
       );
     } catch (e) {
       print('Error uploading data to Firestore: $e');
-      Navigator.of(context).pop(); // Tutup indikator progres
+      Navigator.of(context).pop();
       Navigator.of(context).push(
         ErrorOverlay(
           message: "Profile Gagal diupload",
@@ -363,22 +361,22 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
   }
 
   Future<String> _uploadImageToFirebaseStorage() async {
-  try {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception('User is not authenticated');
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User is not authenticated');
+      }
+      String userEmail = user.email ?? '';
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('kendaraan_images')
+          .child('$userEmail.jpg');
+      await ref.putFile(_image!);
+      String imageUrl = await ref.getDownloadURL();
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image to Firebase Storage: $e');
+      throw e;
     }
-    String userEmail = user.email ?? '';
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('kendaraan_images')
-        .child('$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
-    await ref.putFile(_image!);
-    String imageUrl = await ref.getDownloadURL();
-    return imageUrl;
-  } catch (e) {
-    print('Error uploading image to Firebase Storage: $e');
-    throw e;
   }
-}
 }

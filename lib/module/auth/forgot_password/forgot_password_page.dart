@@ -18,7 +18,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _errorMessage = '';
 
-
   Future<void> _sendPasswordResetEmail(BuildContext context) async {
     final email = _emailController.text;
     try {
@@ -79,9 +78,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
           SizedBox(height: Dimensions.size10),
-          const Text(
+          Text(
             "Reset Password",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
           const SizedBox(height: 20),
           Padding(
@@ -101,13 +103,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           const SizedBox(height: 20),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 1, 48, 86),
+              backgroundColor: Colors.black,
             ),
             onPressed: () => _sendPasswordResetEmail(context),
-            child: const Text(
+            child: Text(
               'Reset Password',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.orange[200], fontWeight: FontWeight.bold),
             ),
           ),
         ],

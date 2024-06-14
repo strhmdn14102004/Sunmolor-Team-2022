@@ -19,12 +19,9 @@ class VerifyDataPage extends StatefulWidget {
 
 class _VerifyDataPageState extends State<VerifyDataPage> {
   final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _nickNameController =
-      TextEditingController(); // Added nickname field
-  final TextEditingController _addressController =
-      TextEditingController(); // Added address field
-  final TextEditingController _phoneNumberController =
-      TextEditingController(); // Added phone number field
+  final TextEditingController _nickNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
   File? _image;
   String _gender = '';
@@ -150,6 +147,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                     _selectImage(context);
                   },
                   child: CircleAvatar(
+                    backgroundColor: Colors.orange[200],
                     radius: 70,
                     backgroundImage: _image != null
                         ? FileImage(_image!) as ImageProvider<Object>?
@@ -165,7 +163,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                     labelText: 'Nama Lengkap',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(
-                        Radius.circular(20.0), // Adjust the radius as needed
+                        Radius.circular(20.0),
                       ),
                     ),
                   ),
@@ -177,7 +175,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                     labelText: 'Nama Panggilan',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(
-                        Radius.circular(20.0), // Adjust the radius as needed
+                        Radius.circular(20.0),
                       ),
                     ),
                   ),
@@ -189,7 +187,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                     labelText: 'Alamat Lengkap',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(
-                        Radius.circular(20.0), // Adjust the radius as needed
+                        Radius.circular(20.0),
                       ),
                     ),
                   ),
@@ -202,7 +200,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                     labelText: 'No Handphone',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(
-                        Radius.circular(20.0), // Adjust the radius as needed
+                        Radius.circular(20.0),
                       ),
                     ),
                   ),
@@ -219,8 +217,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                         labelText: 'Tanggal Lahir',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
-                            Radius.circular(
-                                20.0), // Adjust the radius as needed
+                            Radius.circular(20.0),
                           ),
                         ),
                       ),
@@ -245,7 +242,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(
-                        Radius.circular(20.0), // Adjust the radius as needed
+                        Radius.circular(20.0),
                       ),
                     ),
                     labelText: 'Jenis Kelamin',
@@ -257,14 +254,13 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
                     _uploadDataToFirestore(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15), // Increase padding
-                    minimumSize:
-                        const Size(double.infinity, 50), // Set button size
+                    backgroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Simpan',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.orange[200]),
                   ),
                 ),
               ],
@@ -282,7 +278,7 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        _imageUrl = null; // Reset imageUrl to null since a new image is chosen
+        _imageUrl = null;
       }
     });
   }
@@ -310,15 +306,12 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
         print('User email is null');
         return;
       }
-
       String fullName = _fullNameController.text.trim();
       String nickName = _nickNameController.text.trim();
       String address = _addressController.text.trim();
       String phoneNumber = _phoneNumberController.text.trim();
       String birthDate = _birthDateController.text.trim();
       String gender = _gender;
-
-      // Validate that all fields are filled
       if (fullName.isEmpty ||
           nickName.isEmpty ||
           address.isEmpty ||
@@ -330,11 +323,8 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
             message: "Isi data diri terlebih dahulu",
           ),
         );
-
-        return; // Stop execution if any field is empty
+        return;
       }
-
-      // Add data to Firestore
       await FirebaseFirestore.instance.collection('users').doc(email).set({
         'fullName': fullName,
         'nickName': nickName,
@@ -343,17 +333,15 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
         'birthDate': birthDate,
         'backgroundImageURL': '',
         'gender': gender,
+        'status': "Member",
         'profileImageURL':
             _image != null ? await _uploadImageToFirebaseStorage() : null,
       });
-
-      // Navigate to the next page after successful upload
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => VerifyDataKendaraanPage(),
         ),
       );
-      // Show success overlay
       Navigator.of(context).push(
         SuccessOverlay(
           message:
@@ -362,7 +350,6 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
       );
     } catch (e) {
       print('Error uploading data to Firestore: $e');
-      // Show error overlay
       Navigator.of(context).push(
         ErrorOverlay(
           message: "Profile Gagal diupload",
@@ -378,8 +365,10 @@ class _VerifyDataPageState extends State<VerifyDataPage> {
         throw Exception('User is not authenticated');
       }
       String userEmail = user.email ?? '';
-      Reference ref = FirebaseStorage.instance.ref().child('user_images').child(
-          '$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('user_images')
+          .child('$userEmail.jpg');
       await ref.putFile(_image!);
       String imageUrl = await ref.getDownloadURL();
       return imageUrl;

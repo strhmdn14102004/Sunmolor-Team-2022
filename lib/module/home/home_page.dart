@@ -300,7 +300,7 @@ class _HomePageState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
-                  backgroundColor: Colors.blue[100],
+                  backgroundColor: Colors.black,
                   heroTag: 'account',
                   onPressed: () {
                     Navigator.push(
@@ -308,9 +308,9 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(builder: (context) => AccountPage()),
                     );
                   },
-                  child: const Icon(
+                  child:  Icon(
                     Icons.person,
-                    color: Colors.black,
+                   color: Colors.orange[200]
                   ),
                 ),
               ),
@@ -320,7 +320,7 @@ class _HomePageState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: FloatingActionButton(
-                  backgroundColor: Colors.blue[100],
+                  backgroundColor: Colors.black,
                   heroTag: 'Chat',
                   onPressed: () {
                     Navigator.push(
@@ -330,7 +330,7 @@ class _HomePageState extends State<HomePage> {
                               GroupChatPage(groupId: _groupId.toString())),
                     );
                   },
-                  child: const Icon(Icons.chat, color: Colors.black),
+                  child:  Icon(Icons.chat,color: Colors.orange[200]),
                 ),
               ),
             ),
@@ -339,7 +339,7 @@ class _HomePageState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: FloatingActionButton(
-                  backgroundColor: Colors.blue[100],
+                  backgroundColor: Colors.black,
                   heroTag: 'upload',
                   onPressed: () {
                     Navigator.push(
@@ -348,7 +348,7 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   child:
-                      const Icon(Icons.cloud_upload_sharp, color: Colors.black),
+                      Icon(Icons.cloud_upload_sharp, color: Colors.orange[200]),
                 ),
               ),
             ),
@@ -405,7 +405,7 @@ class _HomePageState extends State<HomePage> {
                 child: Stack(
                   children: [
                     CircleAvatar(
-                      backgroundColor: Colors.blue[100],
+                      backgroundColor: Colors.orange[200],
                       radius: 70,
                       backgroundImage:
                           _imageUrl != null ? NetworkImage(_imageUrl!) : null,
@@ -438,7 +438,7 @@ class _HomePageState extends State<HomePage> {
                     Stack(
                       children: [
                         CircleAvatar(
-                          backgroundColor: Colors.blue[100],
+                          backgroundColor:Colors.orange[200],
                           radius: 30,
                           backgroundImage: _imagekendaraanUrl != null
                               ? NetworkImage(_imagekendaraanUrl!)
@@ -582,8 +582,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
-                    child: const Text("Lihat Lokasi Teman saya",
-                        style: TextStyle(color: Colors.white))),
+                    child:  Text("Lihat Lokasi Teman saya",
+                        style: TextStyle(color: Colors.orange[200]))),
               )
             ],
           ),

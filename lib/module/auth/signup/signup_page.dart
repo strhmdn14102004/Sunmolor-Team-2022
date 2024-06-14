@@ -22,47 +22,49 @@ class _SignUpState extends State<SignUp> {
   String _errorMessage = '';
   bool _isObscure = true;
 
-Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
-  try {
-    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-      email: _emailController.text,
-      password: _passwordController.text,
-    );
-    _emailController.clear();
-    _passwordController.clear();
-    setState(() {
-      _errorMessage = '';
-    });
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => VerifyDataPage()),
-    );
-    Navigator.of(context).push(
-      RegisterOverlay(
-        message:
-            "Register akun dengan email\n${userCredential.user!.email}\nBerhasil lanjutkan isi\nData diri anda",
-      ),
-    );
-    print('User signed up: ${userCredential.user!.email}');
-  } catch (e) {
-    String errorMessage = e.toString();
-    if (errorMessage.contains('[firebase_auth/email-already-in-use]')) {
-      errorMessage = 'The email address is already in use by another account.';
-    } else if (errorMessage.contains('[firebase_auth/channel-error]')) {
-      errorMessage = 'Isi Email Dan Passwordnya Terlebih Dahulu';
-    } else if (errorMessage.contains('[firebase_auth/weak-password]')) {
-      errorMessage = 'Password minimal harus memiliki 6 Karakter';
-    }
-    setState(() {
-      _errorMessage = errorMessage;
+  Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
+    try {
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      _emailController.clear();
+      _passwordController.clear();
+      setState(() {
+        _errorMessage = '';
+      });
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => VerifyDataPage()),
+      );
       Navigator.of(context).push(
-        ErrorOverlay(
-          message: _errorMessage,
+        RegisterOverlay(
+          message:
+              "Register akun dengan email\n${userCredential.user!.email}\nBerhasil lanjutkan isi\nData diri anda",
         ),
       );
-    });
-    print(_errorMessage);
+      print('User signed up: ${userCredential.user!.email}');
+    } catch (e) {
+      String errorMessage = e.toString();
+      if (errorMessage.contains('[firebase_auth/email-already-in-use]')) {
+        errorMessage =
+            'The email address is already in use by another account.';
+      } else if (errorMessage.contains('[firebase_auth/channel-error]')) {
+        errorMessage = 'Isi Email Dan Passwordnya Terlebih Dahulu';
+      } else if (errorMessage.contains('[firebase_auth/weak-password]')) {
+        errorMessage = 'Password minimal harus memiliki 6 Karakter';
+      }
+      setState(() {
+        _errorMessage = errorMessage;
+        Navigator.of(context).push(
+          ErrorOverlay(
+            message: _errorMessage,
+          ),
+        );
+      });
+      print(_errorMessage);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -84,9 +86,12 @@ Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
                   ),
                 ),
                 SizedBox(height: Dimensions.size10),
-                const Text(
+                Text(
                   "Daftar Akun\nSunmolor Team",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                     ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -127,13 +132,13 @@ Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 1, 48, 86),
+                    backgroundColor: Colors.black,
                   ),
                   onPressed: () => _signUpWithEmailAndPassword(context),
-                  child: const Text(
+                  child: Text(
                     'Daftar',
                     style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                        color: Colors.orange[200], fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -145,9 +150,9 @@ Future<void> _signUpWithEmailAndPassword(BuildContext context) async {
                           builder: (context) => const LoginScreen()),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'Sudah punya akun? Login',
-                    style: TextStyle(),
+                    style: TextStyle(color: Colors.orange[200]),
                   ),
                 ),
               ],

@@ -235,7 +235,6 @@ class _UploadPageState extends State<UploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         centerTitle: true,
         title: const Text('Upload Photo'),
@@ -398,21 +397,19 @@ class _UploadPageState extends State<UploadPage> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[100],
+                        backgroundColor: Colors.black,
                       ),
                       onPressed: _pickImages,
-                      child: const Icon(Icons.photo_library_rounded,
-                          color: Colors.black),
+                      child: Icon(Icons.photo_library_rounded,
+                          color: Colors.orange[200]),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[100],
+                        backgroundColor: Colors.black,
                       ),
                       onPressed: _uploadFiles,
-                      child: const Icon(
-                        Icons.upload_file_rounded,
-                        color: Colors.black,
-                      ),
+                      child: Icon(Icons.upload_file_rounded,
+                          color: Colors.orange[200]),
                     ),
                   ],
                 ),
@@ -460,7 +457,6 @@ class _UploadPageState extends State<UploadPage> {
                               style: TextStyle(
                                 fontSize: Dimensions.text20,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black,
                               ),
                             ),
                           ],

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sunmolor_team/module/account/account_form/account_form_page.dart';
-import 'package:sunmolor_team/module/auth/email/change_email_page.dart';
+import 'package:sunmolor_team/module/auth/email/verify_email.dart';
 import 'package:sunmolor_team/module/auth/forgot_password/forgot_password_page.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
 import 'package:sunmolor_team/module/kendaraan/kendaraan_page.dart';
@@ -64,51 +64,29 @@ class _AccountPageState extends State<AccountPage> {
     if (isFounder) {
       return Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20), color: Colors.blue[100]),
+            borderRadius: BorderRadius.circular(20), color: Colors.black),
         width: 200,
         child: ElevatedButton(
           onPressed: () {
             _showMakeAdminDialog(context);
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[100],
+            backgroundColor: Colors.black,
             padding: const EdgeInsets.symmetric(vertical: 15),
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text(
+          child: Text(
             'Change Member Status',
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange[200]),
           ),
         ),
       );
     } else {
       return const SizedBox();
     }
-  }
-
-  Widget _buildDeleteAccountButton() {
-    return Container(
-      width: 200,
-      child: ElevatedButton(
-        onPressed: () {
-          _showPasswordInputDialog(context);
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue[100],
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          minimumSize: const Size(double.infinity, 50),
-        ),
-        child: const Text(
-          'Delete Account',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
   }
 
   void _showPasswordInputDialog(BuildContext context) {
@@ -407,14 +385,14 @@ class _AccountPageState extends State<AccountPage> {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: FloatingActionButton(
-                backgroundColor: Colors.blue[100],
+                backgroundColor: Colors.black,
                 heroTag: 'delete',
                 onPressed: () {
                   _showPasswordInputDialog(context);
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.no_accounts_rounded,
-                  color: Colors.red,
+                  color: Colors.orange[200],
                   size: 30,
                 ),
               ),
@@ -425,14 +403,14 @@ class _AccountPageState extends State<AccountPage> {
             child: Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
-                backgroundColor: Colors.blue[100],
+                backgroundColor: Colors.black,
                 heroTag: 'Logout',
                 onPressed: () {
                   _showLogoutConfirmationDialog(context);
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.logout,
-                  color: Colors.black,
+                  color: Colors.orange[200],
                   size: 30,
                 ),
               ),
@@ -455,7 +433,7 @@ class _AccountPageState extends State<AccountPage> {
                 Stack(
                   children: [
                     CircleAvatar(
-                      backgroundColor: Colors.blue[100],
+                      backgroundColor: Colors.orange[200],
                       radius: 70,
                       backgroundImage:
                           _imageUrl != null ? NetworkImage(_imageUrl!) : null,
@@ -484,16 +462,16 @@ class _AccountPageState extends State<AccountPage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
+                      backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                           vertical: 15), // Increase padding
                       minimumSize:
                           const Size(double.infinity, 50), // Set button size
                     ),
-                    child: const Text('My Profile',
+                    child: Text('My Profile',
                         style: TextStyle(
                             fontSize: 16,
-                            color: Colors.black,
+                            color: Colors.orange[200],
                             fontWeight: FontWeight.bold)),
                   ),
                 ),
@@ -511,18 +489,18 @@ class _AccountPageState extends State<AccountPage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
+                      backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                           vertical: 15), // Increase padding
                       minimumSize:
                           const Size(double.infinity, 50), // Set button size
                     ),
-                    child: const Text(
+                    child: Text(
                       'My Vehicle',
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                          color: Colors.orange[200]),
                     ),
                   ),
                 ),
@@ -540,17 +518,16 @@ class _AccountPageState extends State<AccountPage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
+                      backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Verifikasi Email',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange[200]),
                     ),
                   ),
                 ),

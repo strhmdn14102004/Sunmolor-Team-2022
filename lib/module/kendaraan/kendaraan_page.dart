@@ -150,7 +150,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                       _selectImage(context);
                     },
                     child: CircleAvatar(
-                      backgroundColor: Colors.blue[100],
+                      backgroundColor: Colors.orange[200],
                       radius: 70,
                       backgroundImage: _image != null
                           ? FileImage(_image!) as ImageProvider<Object>?
@@ -299,7 +299,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                         _gender = value!;
                       });
                     },
-                    items: <String>['', 'Honda', 'Yamaha', 'Piaggio', 'Suzuki']
+                    items: <String>['', 'Honda', 'Yamaha', 'Piaggio', 'Suzuki', 'Kawasaki']
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -326,12 +326,13 @@ class _KendaraanPageState extends State<KendaraanPage> {
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Simpan',
                     style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                       ),
+                      fontSize: 16,
+                      color: Colors.orange[200],
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],

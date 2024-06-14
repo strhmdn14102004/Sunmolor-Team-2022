@@ -155,9 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       _navigateToForgotPassword(context);
                     },
-                    child: const Text(
+                    child: Text(
                       'Lupa Password?',
-                      style: TextStyle(),
+                      style: TextStyle(color: Colors.orange[200]),
                     ),
                   ),
                 ),
@@ -165,15 +165,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton(
                   onPressed: () => _signInWithEmailAndPassword(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 1, 48, 86),
+                    backgroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Login',
                     style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white,
+                        color: Colors.orange[200],
                         fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -186,9 +186,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(builder: (context) => const SignUp()),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'Belum memiliki akun? Daftar Sekarang',
-                    style: TextStyle(),
+                    style: TextStyle(color: Colors.orange[200]),
                   ),
                 ),
               ],
