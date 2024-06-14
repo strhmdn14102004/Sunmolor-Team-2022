@@ -18,7 +18,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Verifikasi Email'),
+        title: const Text('Verifikasi Email'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -79,7 +79,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
                         onPressed: () => _changeEmail(),
@@ -111,23 +111,15 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     try {
       String newEmail = _newEmailController.text.trim();
       String password = _passwordController.text.trim();
-
       if (newEmail.isNotEmpty && password.isNotEmpty) {
         User? user = FirebaseAuth.instance.currentUser;
-
         if (user != null) {
           AuthCredential credential = EmailAuthProvider.credential(
             email: user.email!,
             password: password,
           );
-
-          // Re-authenticate user to proceed with email change
           await user.reauthenticateWithCredential(credential);
-
-          // Verify the new email address
           await user.verifyBeforeUpdateEmail(newEmail);
-
-          // Optionally, you can send an email verification to the new email
           await user.sendEmailVerification();
           Navigator.of(context).push(
             SuccessOverlay(
@@ -144,7 +136,6 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       }
     } catch (e) {
       print('Error changing email: $e');
-
       String errorMessage = '';
       if (e is FirebaseAuthException) {
         if (e.code == 'too-many-requests') {
@@ -155,7 +146,6 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               e.message ?? 'Failed to change email. Please try again.';
         }
       }
-
       Navigator.of(context).push(
         ErrorOverlay(
           message: errorMessage,

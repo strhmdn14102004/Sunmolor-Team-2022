@@ -20,14 +20,12 @@ class _GroupChatPageState extends State<GroupChatPage> {
   final TextEditingController _messageController = TextEditingController();
   String? _editingMessageId;
   bool _isEmojiPickerVisible = false;
-
   void _toggleEmojiPicker() {
     setState(() {
       _isEmojiPickerVisible = !_isEmojiPickerVisible;
     });
   }
 
-  // Handle emoji selection
   void _handleEmojiSelected(Category? category, Emoji emoji) {
     _messageController.text = _messageController.text + emoji.emoji;
   }
@@ -115,12 +113,10 @@ class _GroupChatPageState extends State<GroupChatPage> {
     bool isMe = message['Pengirim'] == FirebaseAuth.instance.currentUser?.email;
     var timestamp = message['Tanggal Dikirim Pesan'];
     String formattedTime = '';
-
     if (timestamp != null) {
       DateTime sentTime = (timestamp as Timestamp).toDate();
       formattedTime = DateFormat('dd MMM yyyy, hh:mm a').format(sentTime);
     }
-
     return Dismissible(
       key: Key(message.id),
       background: Container(
@@ -172,12 +168,10 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   .get(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  // While waiting for data to load
                   return CircleAvatar(
                     child: Text(message['Pengirim'][0]),
                   );
                 } else {
-                  // Once data is loaded
                   if (snapshot.hasError) {
                     return CircleAvatar(
                       child: Text(message['Pengirim'][0]),
@@ -185,7 +179,6 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   } else if (snapshot.hasData) {
                     var userData = snapshot.data!;
                     String profileImageUrl = userData['profileImageURL'];
-
                     return CircleAvatar(
                       backgroundImage: profileImageUrl.isNotEmpty
                           ? NetworkImage(profileImageUrl)
@@ -343,8 +336,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                           controller: _messageController,
                           onTap: () {
                             setState(() {
-                              _isEmojiPickerVisible =
-                                  false; // Hide emoji picker when user taps the text field
+                              _isEmojiPickerVisible = false;
                             });
                           },
                           decoration: InputDecoration(
@@ -366,15 +358,14 @@ class _GroupChatPageState extends State<GroupChatPage> {
                             icon: Icon(Icons.emoji_emotions_outlined,
                                 color: Colors.orange[200]),
                             onPressed: () {
-                              _toggleEmojiPicker(); // Toggle emoji picker visibility
+                              _toggleEmojiPicker();
                             },
                           ),
                         ),
                         if (_isEmojiPickerVisible)
                           EmojiPicker(
                             onEmojiSelected: (category, emoji) {
-                              _handleEmojiSelected(
-                                  category, emoji); // Handle emoji selection
+                              _handleEmojiSelected(category, emoji);
                             },
                           ),
                       ],

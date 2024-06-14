@@ -120,20 +120,11 @@ class _HomePageState extends State<HomePage> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String email = user.email!;
-
-        // Get reference to Firebase Storage
         Reference storageRef =
             FirebaseStorage.instance.ref().child('background_images/$email');
-
-        // Upload the photo to Firebase Storage
         UploadTask uploadTask = storageRef.putFile(imageFile);
-
-        // Wait for the upload process to complete
         TaskSnapshot taskSnapshot = await uploadTask;
-
-        // Get the download URL of the photo after it's successfully uploaded
         String downloadURL = await taskSnapshot.ref.getDownloadURL();
-
         return downloadURL;
       }
     } catch (e) {
@@ -206,7 +197,6 @@ class _HomePageState extends State<HomePage> {
             .collection('users')
             .doc(email)
             .get();
-
         if (userDoc.exists) {
           setState(() {
             fullName = userDoc['fullName'];
@@ -308,10 +298,7 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(builder: (context) => AccountPage()),
                     );
                   },
-                  child:  Icon(
-                    Icons.person,
-                   color: Colors.orange[200]
-                  ),
+                  child: Icon(Icons.person, color: Colors.orange[200]),
                 ),
               ),
             ),
@@ -330,7 +317,7 @@ class _HomePageState extends State<HomePage> {
                               GroupChatPage(groupId: _groupId.toString())),
                     );
                   },
-                  child:  Icon(Icons.chat,color: Colors.orange[200]),
+                  child: Icon(Icons.chat, color: Colors.orange[200]),
                 ),
               ),
             ),
@@ -438,7 +425,7 @@ class _HomePageState extends State<HomePage> {
                     Stack(
                       children: [
                         CircleAvatar(
-                          backgroundColor:Colors.orange[200],
+                          backgroundColor: Colors.orange[200],
                           radius: 30,
                           backgroundImage: _imagekendaraanUrl != null
                               ? NetworkImage(_imagekendaraanUrl!)
@@ -582,7 +569,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
-                    child:  Text("Lihat Lokasi Teman saya",
+                    child: Text("Lihat Lokasi Teman saya",
                         style: TextStyle(color: Colors.orange[200]))),
               )
             ],

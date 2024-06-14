@@ -9,7 +9,6 @@ import "package:sunmolor_team/api/common/custom_log_interceptor.dart";
 import "package:sunmolor_team/api/interceptor/authorize_interceptor.dart";
 import "package:sunmolor_team/constant.dart";
 
-
 class ApiManager {
   static bool PRIMARY = true;
 
@@ -65,18 +64,4 @@ class ApiManager {
   }
 
   final dio = Dio();
-
-
-
-  Future<Response> getproduck(String endpoint) async {
-    try {
-      final Dio dio = await getDio();
-      final Response response = await dio.get(ApiUrl.produk);
-
-      return response;
-    } catch (e) {
-      print('Error: $e');
-      throw Exception('Failed to perform GET request');
-    }
-  }
 }

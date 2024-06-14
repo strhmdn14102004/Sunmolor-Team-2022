@@ -153,7 +153,6 @@ class _AccountPageState extends State<AccountPage> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.clear();
         if (mounted) {
-          // Check if widget is still mounted
           _scaffoldMessengerKey.currentState?.showSnackBar(
             const SnackBar(content: Text('Account deleted successfully')),
           );
@@ -174,7 +173,6 @@ class _AccountPageState extends State<AccountPage> {
           }
         }
         if (mounted) {
-          // Check if widget is still mounted
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(content: Text(errorMessage)),
           );
@@ -188,8 +186,7 @@ class _AccountPageState extends State<AccountPage> {
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('users').get();
       setState(() {
-        _accountEmails =
-            snapshot.docs.map((doc) => doc.id).toList(); // Get email addresses
+        _accountEmails = snapshot.docs.map((doc) => doc.id).toList();
       });
     } catch (e) {
       print('Error loading account emails: $e');
@@ -204,7 +201,6 @@ class _AccountPageState extends State<AccountPage> {
             .collection('users')
             .doc(user.email)
             .get();
-
         if (userDoc.exists) {
           setState(() {
             isFounder = userDoc['status'] == 'founder';
@@ -362,8 +358,7 @@ class _AccountPageState extends State<AccountPage> {
 
         if (userDoc.exists) {
           setState(() {
-            _imageUrl = userDoc[
-                'profileImageURL']; // Ambil URL gambar profil dari Firestore
+            _imageUrl = userDoc['profileImageURL'];
           });
         }
       }
@@ -463,10 +458,8 @@ class _AccountPageState extends State<AccountPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15), // Increase padding
-                      minimumSize:
-                          const Size(double.infinity, 50), // Set button size
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      minimumSize: const Size(double.infinity, 50),
                     ),
                     child: Text('My Profile',
                         style: TextStyle(
@@ -490,10 +483,8 @@ class _AccountPageState extends State<AccountPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15), // Increase padding
-                      minimumSize:
-                          const Size(double.infinity, 50), // Set button size
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      minimumSize: const Size(double.infinity, 50),
                     ),
                     child: Text(
                       'My Vehicle',
@@ -589,7 +580,7 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Bersihkan semua data dari SharedPreferences
+    await prefs.clear();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),

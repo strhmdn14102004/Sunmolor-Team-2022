@@ -65,11 +65,9 @@ class _AccountFormPageState extends State<AccountFormPage> {
             .collection('users')
             .doc(email)
             .get();
-
         if (userDoc.exists) {
           setState(() {
-            _imageUrl = userDoc[
-                'profileImageURL']; // Ambil URL gambar profil dari Firestore
+            _imageUrl = userDoc['profileImageURL'];
           });
         }
       }
@@ -82,44 +80,31 @@ class _AccountFormPageState extends State<AccountFormPage> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        String email = user.email!; // Ambil email pengguna saat ini
-
+        String email = user.email!;
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
-            .doc(email) // Ambil dokumen berdasarkan email
+            .doc(email)
             .get();
 
         if (userDoc.exists) {
-          print(
-              'Data from Firestore: ${userDoc.data()}'); // Print data from Firestore
+          print('Data from Firestore: ${userDoc.data()}');
           setState(() {
-            // Isi kontrol formulir berdasarkan data yang diambil dari Firestore
             _fullNameController.text = userDoc['fullName'];
-            _nickNameController.text =
-                userDoc['nickName']; // Set nickname field
-            _addressController.text = userDoc['address']; // Set address field
-            _phoneNumberController.text =
-                userDoc['phoneNumber']; // Set phone number field
+            _nickNameController.text = userDoc['nickName'];
+            _addressController.text = userDoc['address'];
+            _phoneNumberController.text = userDoc['phoneNumber'];
             _birthDateController.text = userDoc['birthDate'];
             _gender = userDoc['gender'];
           });
-
-          // Load profile image URL if exists
           String? profileImageURL = userDoc['profileImageURL'];
           if (profileImageURL != null && profileImageURL.isNotEmpty) {
-            // Load profile image from URL if exists
-            // Download the image and store it locally
             try {
               final response = await http.get(Uri.parse(profileImageURL));
               final bytes = response.bodyBytes;
-
-              // Save the image to local storage
               final directory = await getApplicationDocumentsDirectory();
               final imagePath = '${directory.path}/profile_image.jpg';
               File imageFile = File(imagePath);
               await imageFile.writeAsBytes(bytes);
-
-              // Set the image file to the state
               setState(() {
                 _image = imageFile;
               });
@@ -448,8 +433,10 @@ class _AccountFormPageState extends State<AccountFormPage> {
         throw Exception('User is not authenticated');
       }
       String userEmail = user.email ?? '';
-      Reference ref = FirebaseStorage.instance.ref().child('user_images').child(
-          '$userEmail.jpg'); // Nama file disesuaikan dengan email pengguna
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('user_images')
+          .child('$userEmail.jpg');
       await ref.putFile(_image!);
       String imageUrl = await ref.getDownloadURL();
       return imageUrl;

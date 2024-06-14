@@ -506,7 +506,7 @@ class _UploadPageState extends State<UploadPage> {
                                                   child: Column(
                                                     children: [
                                                       Lottie.asset(
-                                                        'assets/lottie/download.json', // Your Lottie animation file
+                                                        'assets/lottie/download.json',
                                                         width: 100,
                                                         height: 100,
                                                       ),
@@ -551,7 +551,7 @@ class _UploadPageState extends State<UploadPage> {
                                                     ),
                                                   ),
                                                   const SizedBox(width: 10),
-                                                  if (_isAdmin) // Hanya tampilkan tombol delete jika pengguna memiliki status admin atau founder
+                                                  if (_isAdmin)
                                                     ElevatedButton(
                                                       onPressed: _isDownloading
                                                           ? null
