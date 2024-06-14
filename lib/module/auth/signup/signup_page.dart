@@ -109,12 +109,12 @@ class _SignUpState extends State<SignUp> {
                 SizedBox(height: Dimensions.size15),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: _isObscure, // Use the obscureText property
+                  obscureText: _isObscure,
                   decoration: InputDecoration(
                     labelText: 'Password',
                     border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(
-                        Radius.circular(20.0), // Adjust the radius as needed
+                        Radius.circular(20.0),
                       ),
                     ),
                     suffixIcon: IconButton(

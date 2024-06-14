@@ -46,7 +46,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                 .doc('Chat Group')
                 .collection('Pesan')
                 .add({
-              'Pengirim': email, // Ensure this is storing the email
+              'Pengirim': email,
               'Pesan': text,
               'Tanggal Dikirim Pesan': FieldValue.serverTimestamp(),
             });
@@ -100,38 +100,48 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
   Widget _buildMessageItem(DocumentSnapshot message) {
     bool isMe = message['Pengirim'] == FirebaseAuth.instance.currentUser?.email;
+    var timestamp = message['Tanggal Dikirim Pesan'];
+    String formattedTime = '';
+
+    if (timestamp != null) {
+      DateTime sentTime = (timestamp as Timestamp).toDate();
+      formattedTime = DateFormat('dd MMM yyyy, hh:mm a').format(sentTime);
+    }
+
     return Dismissible(
       key: Key(message.id),
       background: Container(
         color: Colors.blue,
         alignment: Alignment.centerLeft,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Icon(Icons.edit, color: Colors.white),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(Icons.edit, color: Colors.white),
       ),
       secondaryBackground: Container(
         color: Colors.red,
         alignment: Alignment.centerRight,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Icon(Icons.delete, color: Colors.white),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(Icons.delete, color: Colors.white),
       ),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
           // Edit action
-          DateTime sentTime = (message['Tanggal Dikirim Pesan'] as Timestamp).toDate();
-          bool canEdit = DateTime.now().difference(sentTime).inMinutes <= 10;
+          bool canEdit = timestamp != null &&
+              DateTime.now()
+                      .difference((timestamp as Timestamp).toDate())
+                      .inMinutes <=
+                  10;
           if (canEdit && isMe) {
             _editMessage(message);
-            return false; // To avoid dismissing the item
+            return false;
           } else {
-            return false; // Edit not allowed
+            return false;
           }
         } else if (direction == DismissDirection.endToStart) {
-          // Delete action
           if (isMe) {
             _deleteMessage(message.id);
-            return true; // To dismiss the item
+            return true;
           } else {
-            return false; // Delete not allowed
+            return false;
           }
         }
         return false;
@@ -142,20 +152,49 @@ class _GroupChatPageState extends State<GroupChatPage> {
           crossAxisAlignment:
               isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Text(
-              message['Pengirim'],
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(message['Pengirim'])
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // While waiting for data to load
+                  return CircleAvatar(
+                    child: Text(message['Pengirim'][0]),
+                  );
+                } else {
+                  // Once data is loaded
+                  if (snapshot.hasError) {
+                    return CircleAvatar(
+                      child: Text(message['Pengirim'][0]),
+                    );
+                  } else if (snapshot.hasData) {
+                    var userData = snapshot.data!;
+                    String profileImageUrl = userData['profileImageURL'];
+
+                    return CircleAvatar(
+                      backgroundImage: profileImageUrl.isNotEmpty
+                          ? NetworkImage(profileImageUrl)
+                              as ImageProvider<Object>?
+                          : AssetImage('assets/images/default_profile.png')
+                              as ImageProvider<Object>?,
+                    );
+                  } else {
+                    return CircleAvatar(
+                      child: Text(message['Pengirim'][0]),
+                    );
+                  }
+                }
+              },
             ),
-            const SizedBox(height: 5),
+            SizedBox(
+              height: Dimensions.size10,
+            ),
             Row(
               mainAxisAlignment:
                   isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
               children: [
-                if (!isMe)
-                  CircleAvatar(
-                    child: Text(message['Pengirim'][0]),
-                  ),
-                if (!isMe) const SizedBox(width: 10),
                 Flexible(
                   child: Container(
                     padding: const EdgeInsets.all(10),
@@ -165,15 +204,36 @@ class _GroupChatPageState extends State<GroupChatPage> {
                       color: isMe ? Colors.blue[200] : Colors.grey[300],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      message['Pesan'],
-                      style: const TextStyle(color: Colors.black),
+                    child: Column(
+                      crossAxisAlignment: isMe
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          message['Pesan'],
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        const SizedBox(height: 5),
+                      ],
                     ),
                   ),
                 ),
                 if (isMe) const SizedBox(width: 10),
               ],
             ),
+            SizedBox(
+              height: Dimensions.size10,
+            ),
+            if (formattedTime.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: Text(
+                  formattedTime,
+                  style: const TextStyle(
+                    fontSize: 10,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
