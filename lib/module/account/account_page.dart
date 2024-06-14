@@ -372,162 +372,174 @@ class _AccountPageState extends State<AccountPage> {
     User? user = FirebaseAuth.instance.currentUser;
     String email = user != null ? user.email ?? "" : "";
 
-    return Scaffold(
-      floatingActionButton: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 35),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: FloatingActionButton(
-                backgroundColor: Colors.black,
-                heroTag: 'delete',
-                onPressed: () {
-                  _showPasswordInputDialog(context);
-                },
-                child: Icon(
-                  Icons.no_accounts_rounded,
-                  color: Colors.orange[200],
-                  size: 30,
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: Scaffold(
+        floatingActionButton: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 35),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.black,
+                  heroTag: 'delete',
+                  onPressed: () {
+                    _showPasswordInputDialog(context);
+                  },
+                  child: Icon(
+                    Icons.no_accounts_rounded,
+                    color: Colors.orange[200],
+                    size: 30,
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 5),
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                backgroundColor: Colors.black,
-                heroTag: 'Logout',
-                onPressed: () {
-                  _showLogoutConfirmationDialog(context);
-                },
-                child: Icon(
-                  Icons.logout,
-                  color: Colors.orange[200],
-                  size: 30,
+            Padding(
+              padding: const EdgeInsets.only(right: 5),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.black,
+                  heroTag: 'Logout',
+                  onPressed: () {
+                    _showLogoutConfirmationDialog(context);
+                  },
+                  child: Icon(
+                    Icons.logout,
+                    color: Colors.orange[200],
+                    size: 30,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: _backgroundImageUrl != null
-              ? DecorationImage(
-                  image: NetworkImage(_backgroundImageUrl!), fit: BoxFit.cover)
-              : null,
+          ],
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 100),
-            child: Column(
-              children: [
-                Stack(
+        body: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {});
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              image: _backgroundImageUrl != null
+                  ? DecorationImage(
+                      image: NetworkImage(_backgroundImageUrl!),
+                      fit: BoxFit.cover)
+                  : null,
+            ),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 100),
+                child: Column(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.orange[200],
-                      radius: 70,
-                      backgroundImage:
-                          _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.orange[200],
+                          radius: 70,
+                          backgroundImage: _imageUrl != null
+                              ? NetworkImage(_imageUrl!)
+                              : null,
+                        ),
+                        if (_imageUrl == null)
+                          const Positioned.fill(
+                            child: CircularProgressIndicator(),
+                          ),
+                      ],
                     ),
-                    if (_imageUrl == null)
-                      const Positioned.fill(
-                        child: CircularProgressIndicator(),
+                    const SizedBox(height: 20),
+                    Text(
+                      fullName.isNotEmpty ? fullName : email,
+                      style: const TextStyle(
+                          fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      width: 200,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AccountFormPage()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        child: Text('My Profile',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.orange[200],
+                                fontWeight: FontWeight.bold)),
                       ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      width: 200,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => KendaraanPage()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        child: Text(
+                          'My Vehicle',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange[200]),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      width: 200,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChangeEmailPage()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        child: Text(
+                          'Verifikasi Email',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange[200]),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    _buildMakeAdminButton(),
+                    const SizedBox(height: 20),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  fullName.isNotEmpty ? fullName : email,
-                  style: const TextStyle(
-                      fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  width: 200,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AccountFormPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: Text('My Profile',
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.orange[200],
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: 200,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => KendaraanPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: Text(
-                      'My Vehicle',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[200]),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: 200,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ChangeEmailPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: Text(
-                      'Verifikasi Email',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[200]),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                _buildMakeAdminButton(),
-                const SizedBox(height: 20),
-              ],
+              ),
             ),
           ),
         ),

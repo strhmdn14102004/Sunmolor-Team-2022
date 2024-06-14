@@ -289,309 +289,316 @@ class _UploadPageState extends State<UploadPage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_isAdmin)
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.grey[500]),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextField(
-                    controller: _folderController,
-                    decoration: InputDecoration(
-                      labelText: 'Masukan Nama Folder',
-                      labelStyle: const TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold),
-                      border: InputBorder.none,
-                      suffixIcon: IconButton(
-                        icon: const Icon(
-                          Icons.create_new_folder_rounded,
-                          color: Colors.black,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {});
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_isAdmin)
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey[500]),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      controller: _folderController,
+                      decoration: InputDecoration(
+                        labelText: 'Masukan Nama Folder',
+                        labelStyle: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                        border: InputBorder.none,
+                        suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.create_new_folder_rounded,
+                            color: Colors.black,
+                          ),
+                          onPressed: () {
+                            if (_folderController.text.isNotEmpty) {
+                              _createFolder(_folderController.text);
+                              _folderController.clear();
+                            }
+                          },
                         ),
-                        onPressed: () {
-                          if (_folderController.text.isNotEmpty) {
-                            _createFolder(_folderController.text);
-                            _folderController.clear();
-                          }
-                        },
                       ),
                     ),
                   ),
-                ),
-              const SizedBox(height: 20),
-              Center(
-                child: FutureBuilder<List<String>>(
-                  future: _getFolders(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Text('No folders available');
-                    } else {
-                      return DropdownButton<String>(
-                        value: _selectedFolder,
-                        hint: const Text('Pilih Folder'),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedFolder = newValue;
-                            _selectedPhotos = [];
-                          });
-                        },
-                        items: snapshot.data!
-                            .map<DropdownMenuItem<String>>((String folder) {
-                          return DropdownMenuItem<String>(
-                            value: folder,
-                            child: Text(folder),
-                          );
-                        }).toList(),
-                      );
-                    }
-                  },
-                ),
-              ),
-              Wrap(
-                spacing: 10,
-                children: _images
-                    .map((image) => Stack(
-                          children: [
-                            Image.file(image, width: 100, height: 100),
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: IconButton(
-                                icon:
-                                    const Icon(Icons.cancel, color: Colors.red),
-                                onPressed: () {
-                                  setState(() {
-                                    _images.remove(image);
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 20),
-              if (_uploadProgress > 0)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: LinearProgressIndicator(
-                    value: _uploadProgress,
-                    minHeight: 10,
-                    backgroundColor: Colors.grey[200],
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(Colors.blue),
+                const SizedBox(height: 20),
+                Center(
+                  child: FutureBuilder<List<String>>(
+                    future: _getFolders(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Text('No folders available');
+                      } else {
+                        return DropdownButton<String>(
+                          value: _selectedFolder,
+                          hint: const Text('Pilih Folder'),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedFolder = newValue;
+                              _selectedPhotos = [];
+                            });
+                          },
+                          items: snapshot.data!
+                              .map<DropdownMenuItem<String>>((String folder) {
+                            return DropdownMenuItem<String>(
+                              value: folder,
+                              child: Text(folder),
+                            );
+                          }).toList(),
+                        );
+                      }
+                    },
                   ),
                 ),
-              if (_isAdmin)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                      ),
-                      onPressed: _pickImages,
-                      child: Icon(Icons.photo_library_rounded,
-                          color: Colors.orange[200]),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                      ),
-                      onPressed: _uploadFiles,
-                      child: Icon(Icons.upload_file_rounded,
-                          color: Colors.orange[200]),
-                    ),
-                  ],
-                ),
-              const SizedBox(height: 20),
-              if (_selectedFolder != null)
-                FutureBuilder<List<Map<String, dynamic>>>(
-                  future: _getPhotos(_selectedFolder!),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 1,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemCount: 6,
-                        itemBuilder: (context, index) {
-                          return Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(
-                              color: Colors.white,
-                            ),
-                          );
-                        },
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Lottie.asset(
-                              "assets/lottie/no.json",
-                              frameRate: const FrameRate(60),
-                              width: Dimensions.size100 * 2,
-                              repeat: true,
-                            ),
-                            Text(
-                              "Tidak ada photo di folder ini...",
-                              style: TextStyle(
-                                fontSize: Dimensions.text20,
-                                fontWeight: FontWeight.w500,
+                Wrap(
+                  spacing: 10,
+                  children: _images
+                      .map((image) => Stack(
+                            children: [
+                              Image.file(image, width: 100, height: 100),
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.cancel,
+                                      color: Colors.red),
+                                  onPressed: () {
+                                    setState(() {
+                                      _images.remove(image);
+                                    });
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ))
+                      .toList(),
+                ),
+                const SizedBox(height: 20),
+                if (_uploadProgress > 0)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: LinearProgressIndicator(
+                      value: _uploadProgress,
+                      minHeight: 10,
+                      backgroundColor: Colors.grey[200],
+                      valueColor:
+                          const AlwaysStoppedAnimation<Color>(Colors.blue),
+                    ),
+                  ),
+                if (_isAdmin)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
                         ),
-                      );
-                    } else {
-                      _allPhotos = List.from(snapshot.data!);
-                      return Column(
-                        children: [
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              childAspectRatio: 1,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                            ),
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              var photo = snapshot.data![index];
-                              bool isSelected = _selectedPhotos.contains(photo);
-                              return GestureDetector(
-                                onTap: () async {
-                                  setState(() {
-                                    if (isSelected) {
-                                      _selectedPhotos.remove(photo);
-                                    } else {
-                                      _selectedPhotos.add(photo);
-                                    }
-                                  });
-                                  await showDialog(
-                                    context: context,
-                                    builder: (context) => StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return AlertDialog(
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Image.network(photo['url']),
-                                              if (_isDownloading)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 16.0),
-                                                  child: Column(
-                                                    children: [
-                                                      Lottie.asset(
-                                                        'assets/lottie/download.json',
-                                                        width: 100,
-                                                        height: 100,
-                                                      ),
-                                                      LinearProgressIndicator(
-                                                        value:
-                                                            _downloadProgress,
-                                                        minHeight: 10,
-                                                        backgroundColor:
-                                                            Colors.grey[200],
-                                                        valueColor:
-                                                            const AlwaysStoppedAnimation<
-                                                                    Color>(
-                                                                Colors.blue),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: const Icon(
-                                                        Icons.close_rounded),
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  ElevatedButton(
-                                                    onPressed: _isDownloading
-                                                        ? null
-                                                        : () {
-                                                            _downloadFile(
-                                                                photo['url']);
-                                                          },
-                                                    child: const Icon(
-                                                      Icons
-                                                          .file_download_rounded,
-                                                      color: Colors.green,
+                        onPressed: _pickImages,
+                        child: Icon(Icons.photo_library_rounded,
+                            color: Colors.orange[200]),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                        ),
+                        onPressed: _uploadFiles,
+                        child: Icon(Icons.upload_file_rounded,
+                            color: Colors.orange[200]),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 20),
+                if (_selectedFolder != null)
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _getPhotos(_selectedFolder!),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 1,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                          itemCount: 6,
+                          itemBuilder: (context, index) {
+                            return Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Lottie.asset(
+                                "assets/lottie/no.json",
+                                frameRate: const FrameRate(60),
+                                width: Dimensions.size100 * 2,
+                                repeat: true,
+                              ),
+                              Text(
+                                "Tidak ada photo di folder ini...",
+                                style: TextStyle(
+                                  fontSize: Dimensions.text20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        _allPhotos = List.from(snapshot.data!);
+                        return Column(
+                          children: [
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                childAspectRatio: 1,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                              ),
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                var photo = snapshot.data![index];
+                                bool isSelected =
+                                    _selectedPhotos.contains(photo);
+                                return GestureDetector(
+                                  onTap: () async {
+                                    setState(() {
+                                      if (isSelected) {
+                                        _selectedPhotos.remove(photo);
+                                      } else {
+                                        _selectedPhotos.add(photo);
+                                      }
+                                    });
+                                    await showDialog(
+                                      context: context,
+                                      builder: (context) => StatefulBuilder(
+                                        builder: (context, setState) {
+                                          return AlertDialog(
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Image.network(photo['url']),
+                                                if (_isDownloading)
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 16.0),
+                                                    child: Column(
+                                                      children: [
+                                                        Lottie.asset(
+                                                          'assets/lottie/download.json',
+                                                          width: 100,
+                                                          height: 100,
+                                                        ),
+                                                        LinearProgressIndicator(
+                                                          value:
+                                                              _downloadProgress,
+                                                          minHeight: 10,
+                                                          backgroundColor:
+                                                              Colors.grey[200],
+                                                          valueColor:
+                                                              const AlwaysStoppedAnimation<
+                                                                      Color>(
+                                                                  Colors.blue),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  const SizedBox(width: 10),
-                                                  if (_isAdmin)
+                                                const SizedBox(height: 10),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: const Icon(
+                                                          Icons.close_rounded),
+                                                    ),
+                                                    const SizedBox(width: 10),
                                                     ElevatedButton(
                                                       onPressed: _isDownloading
                                                           ? null
                                                           : () {
-                                                              _deletePhoto(
-                                                                  context,
-                                                                  photo);
+                                                              _downloadFile(
+                                                                  photo['url']);
                                                             },
                                                       child: const Icon(
-                                                        Icons.delete_forever,
-                                                        color: Colors.red,
+                                                        Icons
+                                                            .file_download_rounded,
+                                                        color: Colors.green,
                                                       ),
                                                     ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
+                                                    const SizedBox(width: 10),
+                                                    if (_isAdmin)
+                                                      ElevatedButton(
+                                                        onPressed:
+                                                            _isDownloading
+                                                                ? null
+                                                                : () {
+                                                                    _deletePhoto(
+                                                                        context,
+                                                                        photo);
+                                                                  },
+                                                        child: const Icon(
+                                                          Icons.delete_forever,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  child: ColorFiltered(
+                                    colorFilter: ColorFilter.mode(
+                                      isSelected
+                                          ? Colors.grey
+                                          : Colors.transparent,
+                                      BlendMode.saturation,
                                     ),
-                                  );
-                                },
-                                child: ColorFiltered(
-                                  colorFilter: ColorFilter.mode(
-                                    isSelected
-                                        ? Colors.grey
-                                        : Colors.transparent,
-                                    BlendMode.saturation,
+                                    child: Image.network(photo['url']),
                                   ),
-                                  child: Image.network(photo['url']),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    }
-                  },
-                ),
-            ],
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+              ],
+            ),
           ),
         ),
       ),

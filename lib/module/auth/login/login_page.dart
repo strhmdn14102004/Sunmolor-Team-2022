@@ -65,8 +65,15 @@ class _LoginScreenState extends State<LoginScreen> {
         errorMessage = 'Isi username dan password terlebih dahulu';
       } else if (errorMessage.contains('[firebase_auth/invalid-credential]')) {
         errorMessage =
-            'Akun tidak ditemukan pastikan kamu Telah Register Akun.\nAtau Cek Kembali Password dan Email kamu';
+            'Akun tidak ditemukan, pastikan kamu Telah Register Akun.\nAtau Cek Kembali Password dan Email kamu';
+      } else if (errorMessage
+          .contains('[firebase_auth/network-request-failed]')) {
+        errorMessage = 'Jaringan bermasalah, cek koneksi internetmu';
+      } else if (errorMessage.contains('[firebase_auth/unknown]')) {
+        errorMessage =
+            'Jaringan Mu Bermasalah, Silahkan Cek Koneksi Internet Kamu';
       }
+
       setState(() {
         _errorMessage = errorMessage;
       });
@@ -74,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.of(context).push(
         ErrorNoDataAccount(
-          message: _errorMessage,
+          message: "$_errorMessage",
         ),
       );
     }

@@ -207,30 +207,41 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      value: _phoneNumberController,
-                      onChanged: (value) {
-                        setState(() {
-                          _phoneNumberController = value!;
-                        });
-                      },
-                      items: _jenisbbm.map<DropdownMenuItem<String>>(
-                        (String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        },
-                      ).toList(),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20.0),
-                          ),
+                     Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black54),
+                  child: DropdownButtonFormField<String>(
+                    style: const TextStyle(color: Colors.white),
+                    value: _phoneNumberController,
+                    onChanged: (value) {
+                      setState(() {
+                        _phoneNumberController = value!;
+                      });
+                    },
+                    items: <String>[
+                      '',
+                      'Pertalite',
+                      'Pertamax 92',
+                      'Pertamax Turbo',
+                      'Other'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
                         ),
-                        labelText: 'Jenis BBM',
                       ),
+                      labelText: 'Jenis BBM',
+                      labelStyle: TextStyle(color: Colors.white),
                     ),
+                  ),
+                ),
                     const SizedBox(height: 16),
                     GestureDetector(
                       onTap: () {
@@ -251,30 +262,36 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      value: _gender,
-                      onChanged: (value) {
-                        setState(() {
-                          _gender = value!;
-                        });
-                      },
-                      items: _pabrikanAsalList.map<DropdownMenuItem<String>>(
-                        (String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        },
-                      ).toList(),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20.0),
-                          ),
+                    Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black54),
+                  child: DropdownButtonFormField<String>(
+                    style: const TextStyle(color: Colors.white),
+                    value: _gender,
+                    onChanged: (value) {
+                      setState(() {
+                        _gender = value!;
+                      });
+                    },
+                    items: <String>['', 'Honda', 'Yamaha', 'Piaggio', 'Suzuki', 'Kawasaki']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
                         ),
-                        labelText: 'Pabrikan Asal Kendaraan',
                       ),
+                      labelStyle: TextStyle(color: Colors.white),
+                      labelText: 'Pabrikan Asal Kendaraan',
                     ),
+                  ),
+                ),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: () {

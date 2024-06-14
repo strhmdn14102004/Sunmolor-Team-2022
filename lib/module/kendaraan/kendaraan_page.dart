@@ -8,8 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
-import 'package:sunmolor_team/module/auth/login/login_page.dart';
-import 'package:sunmolor_team/module/home/home_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
 import 'package:sunmolor_team/overlay/no_account_registered.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
@@ -326,10 +324,10 @@ class _KendaraanPageState extends State<KendaraanPage> {
                 const SizedBox(height: 16),
                 Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.black54),
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.black54,
+                  ),
                   child: DropdownButtonFormField<String>(
-                    style: const TextStyle(color: Colors.white),
                     value: _gender,
                     onChanged: (value) {
                       setState(() {
@@ -339,7 +337,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
                     items: _pabrikanAsalList.map<DropdownMenuItem<String>>(
                       (String value) {
                         return DropdownMenuItem<String>(
-                          value: value,
+                          value: value, // Ensure each value is unique
                           child: Text(value),
                         );
                       },
