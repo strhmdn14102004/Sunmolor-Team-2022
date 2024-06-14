@@ -77,7 +77,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
           SizedBox(height: Dimensions.size10),
-          Text(
+          const Text(
             "Reset Password",
             style: TextStyle(
               fontWeight: FontWeight.bold,

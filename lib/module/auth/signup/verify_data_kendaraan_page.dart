@@ -26,6 +26,8 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
   String _gender = '';
   String _phoneNumberController = '';
   String? _imageUrl;
+  List<String> _pabrikanAsalList = [];
+  List<String> _jenisbbm = [];
   String? selectedFuelType;
 
   @override
@@ -33,6 +35,44 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
     super.initState();
     _loadProfileImage();
     _loadUserDataFromFirestore();
+    _fetchPabrikanAsalList();
+    _fetchJenisBBM();
+  }
+
+  void _fetchPabrikanAsalList() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Jenis Kendaraan').get();
+
+      List<String> list = [];
+      querySnapshot.docs.forEach((doc) {
+        list.add(doc.id);
+      });
+
+      setState(() {
+        _pabrikanAsalList = list;
+      });
+    } catch (e) {
+      print('Error fetching pabrikan asal list: $e');
+    }
+  }
+
+  void _fetchJenisBBM() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Jenis BBM').get();
+
+      List<String> list = [];
+      querySnapshot.docs.forEach((doc) {
+        list.add(doc.id);
+      });
+
+      setState(() {
+        _jenisbbm = list;
+      });
+    } catch (e) {
+      print('Error fetching jenis bbm list: $e');
+    }
   }
 
   void _loadProfileImage() async {
@@ -174,18 +214,14 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
                           _phoneNumberController = value!;
                         });
                       },
-                      items: <String>[
-                        '',
-                        'Pertalite',
-                        'Pertamax 92',
-                        'Pertamax Turbo',
-                        'Other'
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                      items: _jenisbbm.map<DropdownMenuItem<String>>(
+                        (String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        },
+                      ).toList(),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -222,19 +258,14 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
                           _gender = value!;
                         });
                       },
-                      items: <String>[
-                        '',
-                        'Honda',
-                        'Yamaha',
-                        'Piaggio',
-                        'Suzuki',
-                        'Kawasaki'
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                      items: _pabrikanAsalList.map<DropdownMenuItem<String>>(
+                        (String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        },
+                      ).toList(),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -354,7 +385,7 @@ class _VerifyDataKendaraanPageState extends State<VerifyDataKendaraanPage> {
       Navigator.of(context).pop();
       Navigator.of(context).push(
         ErrorOverlay(
-          message: "Profile Gagal diupload",
+          message: "Profile Kendaraan Gagal diupload",
         ),
       );
     }

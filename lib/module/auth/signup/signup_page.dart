@@ -79,14 +79,14 @@ class _SignUpState extends State<SignUp> {
               children: [
                 ClipOval(
                   child: Image.asset(
-                    'assets/images/Sunmolor.png', // Add your sunmolor_teamee logo image asset
+                    'assets/images/Sunmolor.png',
                     width: 150,
                     height: 150,
                     fit: BoxFit.cover,
                   ),
                 ),
                 SizedBox(height: Dimensions.size10),
-                Text(
+                const Text(
                   "Daftar Akun\nSunmolor Team",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -101,7 +101,7 @@ class _SignUpState extends State<SignUp> {
                     labelText: 'Email',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(
-                        Radius.circular(20.0), // Adjust the radius as needed
+                        Radius.circular(20.0),
                       ),
                     ),
                   ),

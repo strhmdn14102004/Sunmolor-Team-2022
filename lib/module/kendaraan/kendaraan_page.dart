@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sunmolor_team/helper/dimension.dart';
 import 'package:sunmolor_team/module/auth/login/login_page.dart';
+import 'package:sunmolor_team/module/home/home_page.dart';
 import 'package:sunmolor_team/overlay/error_overlay.dart';
 import 'package:sunmolor_team/overlay/no_account_registered.dart';
 import 'package:sunmolor_team/overlay/success_overlay.dart';
@@ -27,6 +28,8 @@ class _KendaraanPageState extends State<KendaraanPage> {
   String _gender = '';
   String _phoneNumberController = '';
   String? _imageUrl;
+  List<String> _pabrikanAsalList = [];
+  List<String> _jenisbbm = [];
   String? selectedFuelType;
 
   @override
@@ -35,6 +38,44 @@ class _KendaraanPageState extends State<KendaraanPage> {
     _loadProfileImage();
     _loadBackgroundImage();
     _loadUserDataFromFirestore();
+    _fetchPabrikanAsalList();
+    _fetchJenisBBM();
+  }
+
+  void _fetchPabrikanAsalList() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Jenis Kendaraan').get();
+
+      List<String> list = [];
+      querySnapshot.docs.forEach((doc) {
+        list.add(doc.id);
+      });
+
+      setState(() {
+        _pabrikanAsalList = list;
+      });
+    } catch (e) {
+      print('Error fetching pabrikan asal list: $e');
+    }
+  }
+
+  void _fetchJenisBBM() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Jenis BBM').get();
+
+      List<String> list = [];
+      querySnapshot.docs.forEach((doc) {
+        list.add(doc.id);
+      });
+
+      setState(() {
+        _jenisbbm = list;
+      });
+    } catch (e) {
+      print('Error fetching jenis bbm list: $e');
+    }
   }
 
   void _loadBackgroundImage() async {
@@ -237,18 +278,14 @@ class _KendaraanPageState extends State<KendaraanPage> {
                         _phoneNumberController = value!;
                       });
                     },
-                    items: <String>[
-                      '',
-                      'Pertalite',
-                      'Pertamax 92',
-                      'Pertamax Turbo',
-                      'Other'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    items: _jenisbbm.map<DropdownMenuItem<String>>(
+                      (String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      },
+                    ).toList(),
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
@@ -299,13 +336,14 @@ class _KendaraanPageState extends State<KendaraanPage> {
                         _gender = value!;
                       });
                     },
-                    items: <String>['', 'Honda', 'Yamaha', 'Piaggio', 'Suzuki', 'Kawasaki']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    items: _pabrikanAsalList.map<DropdownMenuItem<String>>(
+                      (String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      },
+                    ).toList(),
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
@@ -414,7 +452,6 @@ class _KendaraanPageState extends State<KendaraanPage> {
         );
         return;
       }
-
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -422,7 +459,7 @@ class _KendaraanPageState extends State<KendaraanPage> {
           return const Center(
             child: CircularProgressIndicator(
               value: null,
-              strokeWidth: 6, // Thickness of the circular progress
+              strokeWidth: 6,
             ),
           );
         },
@@ -437,23 +474,17 @@ class _KendaraanPageState extends State<KendaraanPage> {
         'kendaraanImageURL':
             _image != null ? await _uploadImageToFirebaseStorage() : null,
       });
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (context) =>
-                const LoginScreen()), // Navigate back to login
-      );
       Navigator.of(context).push(
         SuccessOverlay(
-          message: "Akun Berhasil dibuat, Login untuk masuk",
+          message: "Data Kendaraan Berhasil Diperbarui",
         ),
       );
     } catch (e) {
       print('Error uploading data to Firestore: $e');
-      Navigator.of(context).pop(); // Close progress indicator
+      Navigator.of(context).pop();
       Navigator.of(context).push(
         ErrorOverlay(
-          message: "Profile Gagal diupload",
+          message: "Data Kendaraan Gagal diupload",
         ),
       );
     }

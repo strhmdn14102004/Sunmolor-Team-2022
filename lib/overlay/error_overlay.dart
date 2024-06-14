@@ -49,7 +49,7 @@ class ErrorOverlay extends ModalRoute<void> {
           children: <Widget>[
             Lottie.asset(
               "assets/lottie/error.json",
-              frameRate: FrameRate(60),
+              frameRate: const FrameRate(60),
               width: Dimensions.size100 * 3,
               repeat: true,
             ),
