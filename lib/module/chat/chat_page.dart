@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,18 @@ class GroupChatPage extends StatefulWidget {
 class _GroupChatPageState extends State<GroupChatPage> {
   final TextEditingController _messageController = TextEditingController();
   String? _editingMessageId;
+  bool _isEmojiPickerVisible = false;
+
+  void _toggleEmojiPicker() {
+    setState(() {
+      _isEmojiPickerVisible = !_isEmojiPickerVisible;
+    });
+  }
+
+  // Handle emoji selection
+  void _handleEmojiSelected(Category? category, Emoji emoji) {
+    _messageController.text = _messageController.text + emoji.emoji;
+  }
 
   void _sendMessage(String text) async {
     try {
@@ -243,25 +256,24 @@ class _GroupChatPageState extends State<GroupChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Padding(
-          padding: EdgeInsets.only(right: 35),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.transparent,
-                backgroundImage: AssetImage('assets/images/Sunmolor.png'),
-              ),
-              SizedBox(width: 10),
-              Text('Sunmolor Team Chat'),
-            ],
+        appBar: AppBar(
+          title: const Padding(
+            padding: EdgeInsets.only(right: 35),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  backgroundImage: AssetImage('assets/images/Sunmolor.png'),
+                ),
+                SizedBox(width: 10),
+                Text('Sunmolor Team Chat'),
+              ],
+            ),
           ),
         ),
-      ),
-      body: Column(
-        children: [
+        body: Column(children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -321,22 +333,51 @@ class _GroupChatPageState extends State<GroupChatPage> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.black45),
-                    child: TextField(
-                      style: const TextStyle(color: Colors.white),
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        fillColor: Colors.black26,
-                        hintText: '  Kirim sebuah pesan ...',
-                        hintStyle: TextStyle(color: Colors.orange[200]),
-                        filled: true,
-                        contentPadding: const EdgeInsets.all(10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black45,
+                    ),
+                    child: Stack(
+                      children: [
+                        TextField(
+                          style: const TextStyle(color: Colors.white),
+                          controller: _messageController,
+                          onTap: () {
+                            setState(() {
+                              _isEmojiPickerVisible =
+                                  false; // Hide emoji picker when user taps the text field
+                            });
+                          },
+                          decoration: InputDecoration(
+                            fillColor: Colors.black26,
+                            hintText: '  Kirim sebuah pesan ...',
+                            hintStyle: TextStyle(color: Colors.orange[200]),
+                            filled: true,
+                            contentPadding: const EdgeInsets.all(10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
                         ),
-                      ),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: IconButton(
+                            icon: Icon(Icons.emoji_emotions_outlined,
+                                color: Colors.orange[200]),
+                            onPressed: () {
+                              _toggleEmojiPicker(); // Toggle emoji picker visibility
+                            },
+                          ),
+                        ),
+                        if (_isEmojiPickerVisible)
+                          EmojiPicker(
+                            onEmojiSelected: (category, emoji) {
+                              _handleEmojiSelected(
+                                  category, emoji); // Handle emoji selection
+                            },
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -352,9 +393,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+          )
+        ]));
   }
 }

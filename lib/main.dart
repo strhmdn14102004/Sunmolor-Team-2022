@@ -24,6 +24,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await requestPermissions();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   tz.initializeTimeZones();
   const AndroidInitializationSettings initializationSettingsAndroid =
