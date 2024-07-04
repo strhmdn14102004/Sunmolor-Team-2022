@@ -537,6 +537,7 @@ class _AccountPageState extends State<AccountPage> {
                     ),
                     _buildMakeAdminButton(),
                     const SizedBox(height: 20),
+                  
                   ],
                 ),
               ),

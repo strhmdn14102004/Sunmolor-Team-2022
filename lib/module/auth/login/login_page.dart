@@ -43,49 +43,52 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signInWithEmailAndPassword(BuildContext context) async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      _emailController.clear();
-      _passwordController.clear();
+  try {
+    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+    _emailController.clear();
+    _passwordController.clear();
+    if (mounted) {
       setState(() {
         _errorMessage = '';
       });
-      await _saveLoginStatus();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-      print('User signed in: ${userCredential.user!.email}');
-    } catch (e) {
-      String errorMessage = e.toString();
-      if (errorMessage.contains('[firebase_auth/channel-error]')) {
-        errorMessage = 'Isi username dan password terlebih dahulu';
-      } else if (errorMessage.contains('[firebase_auth/invalid-credential]')) {
-        errorMessage =
-            'Akun tidak ditemukan, pastikan kamu Telah Register Akun.\nAtau Cek Kembali Password dan Email kamu';
-      } else if (errorMessage
-          .contains('[firebase_auth/network-request-failed]')) {
-        errorMessage = 'Jaringan bermasalah, cek koneksi internetmu';
-      } else if (errorMessage.contains('[firebase_auth/unknown]')) {
-        errorMessage =
-            'Jaringan Mu Bermasalah, Silahkan Cek Koneksi Internet Kamu';
-      }
+    }
+    await _saveLoginStatus();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
+    print('User signed in: ${userCredential.user!.email}');
+  } catch (e) {
+    String errorMessage = e.toString();
+    if (errorMessage.contains('[firebase_auth/channel-error]')) {
+      errorMessage = 'Isi username dan password terlebih dahulu';
+    } else if (errorMessage.contains('[firebase_auth/invalid-credential]')) {
+      errorMessage =
+          'Akun tidak ditemukan, pastikan kamu Telah Register Akun.\nAtau Cek Kembali Password dan Email kamu';
+    } else if (errorMessage.contains('[firebase_auth/network-request-failed]')) {
+      errorMessage = 'Jaringan bermasalah, cek koneksi internetmu';
+    } else if (errorMessage.contains('[firebase_auth/unknown]')) {
+      errorMessage =
+          'Jaringan Mu Bermasalah, Silahkan Cek Koneksi Internet Kamu';
+    }
 
+    if (mounted) {
       setState(() {
         _errorMessage = errorMessage;
       });
-      print('Sign in error: $_errorMessage');
-
-      Navigator.of(context).push(
-        ErrorNoDataAccount(
-          message: "$_errorMessage",
-        ),
-      );
     }
+    print('Sign in error: $_errorMessage');
+
+    Navigator.of(context).push(
+      ErrorNoDataAccount(
+        message: "$_errorMessage",
+      ),
+    );
   }
+}
 
   void _navigateToForgotPassword(BuildContext context) {
     Navigator.push(
